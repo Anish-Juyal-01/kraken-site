@@ -69,3 +69,113 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--line-now) transparent;
 }
+
+/* ---- water and sea life ---- */
+@keyframes wave-drift {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.wave-drift {
+  animation: wave-drift 30s linear infinite;
+}
+
+/* shafts of light falling from the surface */
+.light-rays {
+  background: repeating-linear-gradient(
+    102deg,
+    rgba(236, 231, 217, 0) 0 5%,
+    rgba(236, 231, 217, 0.07) 6% 8%,
+    rgba(236, 231, 217, 0) 9% 15%,
+    rgba(236, 231, 217, 0.045) 16% 21%,
+    rgba(236, 231, 217, 0) 22% 31%
+  );
+  background-size: 140% 100%;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.5) 45%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.5) 45%, transparent 100%);
+  animation: rays 16s ease-in-out infinite alternate;
+}
+@keyframes rays {
+  from {
+    background-position: 0% 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+
+@keyframes shoal {
+  from {
+    transform: translate3d(-40vw, 0, 0);
+  }
+  to {
+    transform: translate3d(110vw, 0, 0);
+  }
+}
+@keyframes shoal-back {
+  from {
+    transform: translate3d(110vw, 0, 0);
+  }
+  to {
+    transform: translate3d(-40vw, 0, 0);
+  }
+}
+.shoal {
+  left: 0;
+  animation: shoal 70s linear infinite;
+}
+.shoal-back {
+  animation-name: shoal-back;
+}
+
+@keyframes kelp {
+  from {
+    transform: skewX(-5deg);
+  }
+  to {
+    transform: skewX(6deg);
+  }
+}
+.kelp {
+  transform-origin: 50% 100%;
+  transform-box: fill-box;
+  animation: kelp 5.5s ease-in-out infinite alternate;
+}
+.kelp-b {
+  animation-duration: 7s;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-1.2deg);
+  }
+  50% {
+    transform: translate3d(0, 9px, 0) rotate(1.4deg);
+  }
+}
+.buoy {
+  animation: bob 4.6s ease-in-out infinite;
+}
+.buoy-b {
+  animation-duration: 5.4s;
+  animation-delay: -1.7s;
+}
+.buoy-c {
+  animation-duration: 6.1s;
+  animation-delay: -3.1s;
+}
+.buoy-a {
+  animation-delay: -0.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave-drift,
+  .light-rays,
+  .shoal,
+  .kelp,
+  .buoy {
+    animation: none;
+  }
+}

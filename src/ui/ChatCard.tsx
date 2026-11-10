@@ -4,7 +4,7 @@ import type { ChatMsg } from '../content/content';
 export function ChatCard({ msg, children }: { msg: ChatMsg; children?: React.ReactNode }) {
   const isKraken = msg.who === 'kraken';
   return (
-    <div className="rounded-[var(--radius-card)] border border-[var(--line-now)] bg-[var(--card-now)] p-4 backdrop-blur-sm">
+    <div className="rounded-[var(--radius-card)] border border-[var(--line-now)] bg-[var(--card-now)] p-4">
       <div className="flex items-center gap-2.5">
         <span
           aria-hidden

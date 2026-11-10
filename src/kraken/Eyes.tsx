@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import type { Mood } from './moods';
 import { COLORS, toonMaterial } from './toon';
 
-const EYE_R = 0.27;
+const EYE_R = 0.275;
 const EYES: [number, number, number][] = [
   [-0.37, 0.36, 0.8],
   [0.37, 0.36, 0.8],
@@ -12,15 +12,19 @@ const EYES: [number, number, number][] = [
 
 type Props = { mood: React.MutableRefObject<Mood>; look: () => [number, number]; animate: boolean };
 
-/** Two big eyes: pupils follow `look`, lids close with the mood and blink on their own. */
+/** Two big eyes: iris and pupil follow `look`, lids close with the mood and blink on their own. */
 export function Eyes({ mood, look, animate }: Props) {
   const white = useMemo(() => toonMaterial(COLORS.white), []);
-  const dark = useMemo(() => new THREE.MeshBasicMaterial({ color: COLORS.ink }), []);
+  const rim = useMemo(() => new THREE.MeshBasicMaterial({ color: COLORS.outline }), []);
+  const iris = useMemo(() => new THREE.MeshBasicMaterial({ color: COLORS.iris }), []);
+  const pupil = useMemo(() => new THREE.MeshBasicMaterial({ color: '#06120f' }), []);
   const shine = useMemo(() => new THREE.MeshBasicMaterial({ color: '#ffffff' }), []);
-  const lidMat = useMemo(() => toonMaterial(COLORS.coral), []);
-  const ball = useMemo(() => new THREE.SphereGeometry(1, 28, 20), []);
-  const lidGeo = useMemo(() => new THREE.SphereGeometry(1, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2), []);
-  const pupils = useRef<(THREE.Group | null)[]>([]);
+  const lidMat = useMemo(() => toonMaterial(COLORS.coralDeep), []);
+  const ball = useMemo(() => new THREE.SphereGeometry(1, 32, 24), []);
+  const lidGeo = useMemo(() => new THREE.SphereGeometry(1, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), []);
+  const gaze = useRef<(THREE.Group | null)[]>([]);
+  const irises = useRef<(THREE.Mesh | null)[]>([]);
+  const pupils = useRef<(THREE.Mesh | null)[]>([]);
   const lids = useRef<(THREE.Mesh | null)[]>([]);
   const blink = useRef({ next: 2.5, t: -1 });
 
@@ -41,12 +45,10 @@ export function Eyes({ mood, look, animate }: Props) {
     const lid = Math.min(1, m.lid + blinkAmt);
     const [lx, ly] = look();
     for (let i = 0; i < 2; i++) {
-      const p = pupils.current[i];
-      if (p) {
-        p.position.set(lx * 0.1, ly * 0.09, 0);
-        // scale the pupil in place: scaling the whole group would pull it inside the eyeball
-        p.children[0].scale.set(0.135 * m.pupil, 0.15 * m.pupil, 0.05);
-      }
+      gaze.current[i]?.position.set(lx * 0.095, ly * 0.085, 0);
+      // scale the iris and pupil in place; scaling the group would pull them inside the eyeball
+      irises.current[i]?.scale.set(0.165 * (0.85 + m.pupil * 0.15), 0.18 * (0.85 + m.pupil * 0.15), 0.04);
+      pupils.current[i]?.scale.set(0.1 * m.pupil, 0.112 * m.pupil, 0.04);
       const l = lids.current[i];
       // The lid is the top half of a sphere, tipped back out of sight when open.
       if (l) l.rotation.x = -1.8 + lid * 1.9;
@@ -57,11 +59,13 @@ export function Eyes({ mood, look, animate }: Props) {
     <group>
       {EYES.map((pos, i) => (
         <group key={i} position={pos}>
-          <mesh geometry={ball} material={dark} scale={EYE_R + 0.02} position={[0, 0, -0.045]} />
+          <mesh geometry={ball} material={rim} scale={EYE_R + 0.018} position={[0, 0, -0.04]} />
           <mesh geometry={ball} material={white} scale={EYE_R} />
-          <group ref={(g) => (pupils.current[i] = g)}>
-            <mesh geometry={ball} material={dark} scale={[0.135, 0.15, 0.05]} position={[0, 0, EYE_R - 0.012]} />
-            <mesh geometry={ball} material={shine} scale={0.042} position={[0.045, 0.06, EYE_R + 0.03]} />
+          <group ref={(g) => (gaze.current[i] = g)}>
+            <mesh ref={(m) => (irises.current[i] = m)} geometry={ball} material={iris} position={[0, 0, EYE_R - 0.03]} />
+            <mesh ref={(m) => (pupils.current[i] = m)} geometry={ball} material={pupil} position={[0, 0, EYE_R - 0.012]} />
+            <mesh geometry={ball} material={shine} scale={[0.05, 0.055, 0.02]} position={[0.055, 0.07, EYE_R + 0.03]} />
+            <mesh geometry={ball} material={shine} scale={[0.022, 0.024, 0.02]} position={[-0.05, -0.05, EYE_R + 0.03]} />
           </group>
           <mesh ref={(m) => (lids.current[i] = m)} geometry={lidGeo} material={lidMat} scale={EYE_R + 0.03} />
         </group>

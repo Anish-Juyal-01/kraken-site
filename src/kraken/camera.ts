@@ -13,7 +13,7 @@ export function cameraAt(p: number): { pos: [number, number, number]; look: [num
   return { pos: [0, mix(0.5, 0.25, d), mix(8.5, 9.2, d)], look: [0, mix(0.5, 0.15, d), 0] };
 }
 
-const PEEK_Y = -0.77; // eyes just above the waterline
+const PEEK_Y = -0.92; // eyes just above the waterline
 const PEEK_Y_TALL = -1.11; // phones: a smaller kraken under a lower waterline, clear of the text
 const PEEK_SCALE_TALL = 0.62;
 export const isTall = (aspect: number) => Number.isFinite(aspect) && aspect > 0 && aspect < 0.9;
@@ -34,7 +34,7 @@ export function krakenPlacement(p: number, aspect: number): Placement {
   const peekY = tall ? PEEK_Y_TALL : PEEK_Y;
   const peekScale = tall ? PEEK_SCALE_TALL : 1;
   if (c < R.descent[0] + 0.03) {
-    return { x: sideX, y: mix(peekY, -4.5, duck), z: 0, scale: peekScale };
+    return { x: 0, y: mix(peekY, -4.5, duck), z: 0, scale: peekScale }; // centre stage on the first screen
   }
   const midY = tall ? 1.25 : 0;
   const midScale = tall ? 0.6 : 1;
@@ -44,7 +44,7 @@ export function krakenPlacement(p: number, aspect: number): Placement {
   if (c < R.ascent[0]) {
     return { x: mix(0, sideX * 1.18, leave), y: mix(midY, -0.9, leave), z: mix(0, -1.5, leave), scale: mix(midScale, 0.8, leave) };
   }
-  return { x: mix(sideX * 1.18, sideX, rise), y: mix(-0.9, peekY, rise), z: mix(-1.5, 0, rise), scale: mix(0.8, peekScale, rise) };
+  return { x: mix(sideX * 1.18, 0, rise), y: mix(-0.9, peekY, rise), z: mix(-1.5, 0, rise), scale: mix(0.8, peekScale, rise) };
 }
 
 /** Top edge of the water, in vh from the top of the screen. */

@@ -16,7 +16,7 @@ export function Waterline({ flow }: { flow: boolean }) {
   return (
     <Stage id="waterline" flow={flow} onProgress={onProgress}>
       <div className="mx-auto flex h-full max-w-[1400px] items-start px-5 pt-[16vh] md:px-12 md:pt-[20vh]">
-        <div ref={card} className="w-full max-w-[560px] rounded-[var(--radius-card)] border border-[var(--line-now)] bg-[var(--card-now)] p-5 backdrop-blur-sm">
+        <div ref={card} className="w-full max-w-[560px] rounded-[var(--radius-card)] border border-[var(--line-now)] bg-[var(--card-now)] p-5">
           <div className="flex items-center gap-2.5">
             <span aria-hidden className="grid size-7 place-items-center rounded-full border-[1.5px] border-[var(--ink-now)] text-[13px] font-bold">
               A

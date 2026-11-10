@@ -1,5 +1,6 @@
 import { Suspense, lazy, useCallback, useMemo, useRef, useState } from 'react';
 import { moodFor } from './kraken/moods';
+import { armAngle } from './kraken/armCurve';
 import { posesFor, ringFor } from './kraken/poses';
 import type { KrakenState } from './kraken/state';
 import { armIndexAt, armLocal } from './scroll/stages';
@@ -15,7 +16,8 @@ import { SurfaceAgain } from './sections/SurfaceAgain';
 import { Waterline } from './sections/Waterline';
 import { interactions } from './sections/interactions';
 import { DepthGauge } from './ui/DepthGauge';
-import { Water } from './ui/Water';
+import { Ambience } from './ui/Ambience';
+import { WaterBack, WaterFront } from './ui/Water';
 
 // The 3D code is the heavy part: load it after the first screen's text has painted.
 const Scene = lazy(() => import('./kraken/Scene'));
@@ -43,7 +45,7 @@ export default function App() {
     if (atSurface) {
       // peeking over the waterline: one arm is up out of the water, ready to wave
       s.poses[7] = { reach: 0.62, curl: 0.12, lift: 1 };
-      s.ring = ringFor(7, true) + 0.5;
+      s.ring = armAngle(7) - 0.12; // out to the side, clear of the face
     }
     const it = interactions.get();
     s.mood = atSurface ? 'curious' : moodFor(arm, it.storm, it.delivered);
@@ -60,12 +62,14 @@ export default function App() {
 
   return (
     <div ref={root} className="relative">
+      <Ambience />
+      <WaterBack />
       {quality.mode !== 'none' && (
         <Suspense fallback={null}>
           <Scene quality={quality} direct={direct} onLost={() => setDevice((d) => ({ ...d, webgl: false }))} />
         </Suspense>
       )}
-      <Water />
+      <WaterFront />
       <main>
         <Surface flow={flow} />
         <Waterline flow={flow} />

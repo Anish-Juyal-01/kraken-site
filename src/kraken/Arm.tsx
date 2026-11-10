@@ -4,17 +4,30 @@ import * as THREE from 'three';
 import { armAngle, armPoints, armRadius, type Vec3 } from './armCurve';
 import type { KrakenState } from './state';
 import type { Quality } from './quality';
-import { COLORS, toonMaterial } from './toon';
+import { COLORS, setSkinColor, skinMaterial, toonMaterial } from './toon';
 
-const RADIAL = 10;
-const SUCKERS = 7;
+const RADIAL = 14;
+const SUCKERS = 9;
 
-function tubeGeometry(segments: number): THREE.BufferGeometry {
+/** A tube with fixed topology; its vertices are rewritten every frame as the arm moves.
+ *  Vertex 0 of each ring is the arm's top side, so colour can run coral on top, pale below. */
+function tubeGeometry(segments: number, coloured: boolean): THREE.BufferGeometry {
   const rings = segments + 1;
   const g = new THREE.BufferGeometry();
   const count = rings * RADIAL + 1; // + the tip
   g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
   g.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+  if (coloured) {
+    const col = new THREE.BufferAttribute(new Float32Array(count * 3), 3);
+    for (let k = 0; k < rings; k++) {
+      for (let j = 0; j < RADIAL; j++) {
+        const top = Math.cos((j / RADIAL) * Math.PI * 2); // 1 on top, -1 underneath
+        setSkinColor(col, k * RADIAL + j, Math.min(1, Math.max(0, (-top - 0.15) / 0.6)) * 0.9);
+      }
+    }
+    setSkinColor(col, rings * RADIAL, 0.3);
+    g.setAttribute('color', col);
+  }
   const idx: number[] = [];
   for (let k = 0; k < segments; k++) {
     for (let j = 0; j < RADIAL; j++) {
@@ -42,7 +55,7 @@ const P = new THREE.Vector3();
 const SC = new THREE.Vector3();
 const UP = new THREE.Vector3(0, 1, 0);
 
-/** Fill a tube's vertices around the curve. `extra` thickens it (used for the ink outline). */
+/** Fill a tube's vertices around the curve. `extra` thickens it (used for the outline). */
 function fillTube(g: THREE.BufferGeometry, pts: Vec3[], side: THREE.Vector3, extra: number, normalsOut?: Vec3[]) {
   const pos = g.getAttribute('position') as THREE.BufferAttribute;
   const nor = g.getAttribute('normal') as THREE.BufferAttribute;
@@ -54,7 +67,10 @@ function fillTube(g: THREE.BufferGeometry, pts: Vec3[], side: THREE.Vector3, ext
     N.crossVectors(side, T).normalize(); // the arm's top side
     B.crossVectors(T, N).normalize();
     if (normalsOut) normalsOut[k] = [N.x, N.y, N.z];
-    const r = armRadius(k / (n - 1)) + extra;
+    const s = k / (n - 1);
+    // round the tip off instead of ending in a flat cut
+    const tipRound = s > 0.94 ? Math.sqrt(Math.max(0, 1 - ((s - 0.94) / 0.06) ** 2)) * 0.55 + 0.45 : 1;
+    const r = armRadius(s) * tipRound + extra;
     for (let j = 0; j < RADIAL; j++) {
       const phi = (j / RADIAL) * Math.PI * 2;
       const cx = Math.cos(phi);
@@ -67,9 +83,9 @@ function fillTube(g: THREE.BufferGeometry, pts: Vec3[], side: THREE.Vector3, ext
       nor.setXYZ(i, nx, ny, nz);
     }
   }
-  const tipR = armRadius(1) + extra;
+  const tipR = armRadius(1) * 0.45 + extra;
   const end = pts[n - 1];
-  pos.setXYZ(n * RADIAL, end[0] + T.x * tipR * 1.7, end[1] + T.y * tipR * 1.7, end[2] + T.z * tipR * 1.7);
+  pos.setXYZ(n * RADIAL, end[0] + T.x * tipR, end[1] + T.y * tipR, end[2] + T.z * tipR);
   nor.setXYZ(n * RADIAL, T.x, T.y, T.z);
   pos.needsUpdate = true;
   nor.needsUpdate = true;
@@ -80,12 +96,12 @@ type Props = { index: number; state: KrakenState; quality: Quality; children?: R
 
 export function Arm({ index, state, quality, children }: Props) {
   const segments = quality.armSegments;
-  const geo = useMemo(() => tubeGeometry(segments), [segments]);
-  const outlineGeo = useMemo(() => (quality.outline ? tubeGeometry(segments) : null), [segments, quality.outline]);
-  const mat = useMemo(() => toonMaterial(COLORS.coral), []);
-  const outlineMat = useMemo(() => new THREE.MeshBasicMaterial({ color: COLORS.ink, side: THREE.BackSide }), []);
-  const suckerMat = useMemo(() => toonMaterial(COLORS.belly), []);
-  const suckerGeo = useMemo(() => new THREE.SphereGeometry(1, 10, 8), []);
+  const geo = useMemo(() => tubeGeometry(segments, true), [segments]);
+  const outlineGeo = useMemo(() => (quality.outline ? tubeGeometry(segments, false) : null), [segments, quality.outline]);
+  const mat = useMemo(() => skinMaterial(), []);
+  const outlineMat = useMemo(() => new THREE.MeshBasicMaterial({ color: COLORS.outline, side: THREE.BackSide }), []);
+  const suckerMat = useMemo(() => toonMaterial('#fbe3d6'), []);
+  const suckerGeo = useMemo(() => new THREE.SphereGeometry(1, 12, 8), []);
   const suckers = useRef<THREE.InstancedMesh>(null);
   const tip = useRef<THREE.Group>(null);
   const normals = useRef<Vec3[]>([]);
@@ -104,19 +120,19 @@ export function Arm({ index, state, quality, children }: Props) {
     const pts = armPoints(index, t, state.poses[index], lean, segments);
     S0.copy(side);
     fillTube(geo, pts, S0, 0, normals.current);
-    if (outlineGeo) fillTube(outlineGeo, pts, S0, 0.028);
+    if (outlineGeo) fillTube(outlineGeo, pts, S0, 0.02);
 
     if (suckers.current) {
       for (let i = 0; i < SUCKERS; i++) {
-        const s = 0.18 + (i / (SUCKERS - 1)) * 0.72;
+        const s = 0.14 + (i / (SUCKERS - 1)) * 0.78;
         const kf = Math.round(s * segments);
         const p = pts[kf];
         const n = normals.current[kf];
         const r = armRadius(kf / segments);
         N.set(-n[0], -n[1], -n[2]); // underside
-        P.set(p[0] + N.x * r * 0.92, p[1] + N.y * r * 0.92, p[2] + N.z * r * 0.92);
+        P.set(p[0] + N.x * r * 0.94, p[1] + N.y * r * 0.94, p[2] + N.z * r * 0.94);
         Q.setFromUnitVectors(UP, N);
-        SC.set(r * 0.42, r * 0.16, r * 0.42);
+        SC.set(r * 0.4, r * 0.14, r * 0.4);
         suckers.current.setMatrixAt(i, M.compose(P, Q, SC));
       }
       suckers.current.instanceMatrix.needsUpdate = true;

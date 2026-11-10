@@ -58,11 +58,15 @@ export default function Scene({ quality = FULL, direct, onLost }: Props) {
       dpr={[1, quality.mode === 'full' ? 2 : 1.5]}
       camera={{ fov: 32, position: [0, 0.5, 8.5], near: 0.1, far: 60 }}
       gl={{ alpha: true, antialias: true }}
+      // measure at once and ignore page scroll: the canvas is fixed to the screen
+      resize={{ debounce: 0, scroll: false }}
       onCreated={({ gl }) => gl.domElement.addEventListener('webglcontextlost', () => onLost?.(), { once: true })}
     >
       <fog attach="fog" args={['#ece7d9', 9, 19]} />
-      <ambientLight intensity={1.5} />
-      <directionalLight position={[-3, 5, 6]} intensity={2.2} />
+      {/* warm light from above, a cool green bounce from the water below */}
+      <hemisphereLight args={['#fff1e0', '#2f7a6c', 1.5]} />
+      <ambientLight intensity={0.55} />
+      <directionalLight position={[-3.5, 5, 6]} intensity={2.0} />
       <Director state={state} direct={direct} />
       <Kraken
         state={state}

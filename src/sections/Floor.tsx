@@ -5,7 +5,7 @@ import { Stage } from '../ui/Stage';
 export function Floor({ flow }: { flow: boolean }) {
   return (
     <Stage id="floor" flow={flow}>
-      <div className="mx-auto flex h-full max-w-[1400px] flex-col justify-center px-5 py-16 md:px-12">
+      <div className="mx-auto flex h-full max-w-[1400px] flex-col justify-center px-5 pb-[24vh] pt-16 md:px-12">
         <h2 className="display text-4xl md:text-5xl">
           Built on{' '}
           <a className="underline decoration-coral decoration-[3px] underline-offset-[6px]" href={LINKS.switchDocs} target="_blank" rel="noreferrer">

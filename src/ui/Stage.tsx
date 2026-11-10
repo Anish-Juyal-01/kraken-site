@@ -30,7 +30,9 @@ export function Stage({ id, children, className = '', fadeIn = true, fadeOut = t
       const o = Math.min(a, b);
       el.style.opacity = String(o);
       el.style.pointerEvents = o > 0.6 ? 'auto' : 'none';
-      el.style.visibility = o <= 0 ? 'hidden' : 'visible';
+      // display:none, not just hidden: an off-stage panel must not keep any layer on screen
+      el.style.display = o <= 0 ? 'none' : '';
+      el.style.visibility = 'visible';
       cb.current?.(l);
     });
   }, [id, fadeIn, fadeOut, flow]);

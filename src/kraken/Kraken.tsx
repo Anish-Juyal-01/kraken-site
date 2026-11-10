@@ -18,7 +18,7 @@ export function Kraken({ state, quality, renderProp }: Props) {
   const look = useRef<[number, number]>([0, 0]);
   const skirt = useMemo(() => toonMaterial(COLORS.coral), []);
 
-  useFrame((_, dt) => {
+  useFrame(({ clock }, dt) => {
     // A throttled or background tab delivers a frame a second: snap instead of easing slowly.
     const snap = !quality.loop || dt > 0.25;
     const k = snap ? 1 : 1 - Math.exp(-dt * 6);
@@ -26,7 +26,9 @@ export function Kraken({ state, quality, renderProp }: Props) {
     look.current[0] += (state.look[0] - look.current[0]) * k;
     look.current[1] += (state.look[1] - look.current[1]) * k;
     if (root.current) {
-      root.current.position.set(state.x, state.y, state.z);
+      // a slow bob, as if hanging in the water
+      const bob = quality.loop ? Math.sin(clock.elapsedTime * 1.15) * 0.045 : 0;
+      root.current.position.set(state.x, state.y + bob, state.z);
       root.current.scale.setScalar(state.scale);
       root.current.visible = state.scale > 0.01;
     }

@@ -17,7 +17,7 @@ export type KrakenState = {
   lastMove: number; // performance.now() of the last pointer move
 };
 
-export const REST: ArmPose = { reach: 0.45, curl: 0.55, lift: 0 };
+export const REST: ArmPose = { reach: 0.5, curl: 0.78, lift: 0.04 };
 
 export function initialState(): KrakenState {
   return {
