@@ -1,0 +1,48 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
+
+@theme {
+  --color-paper: #ece7d9;
+  --color-ink: #12332d;
+  --color-deep: #0b2420;
+  --color-coral: #e8553d;
+  --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-sans: 'Geist Variable', system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
+  --radius-card: 14px;
+}
+
+:root {
+  /* Written on every scroll update by the scene: the page darkens once as you dive. */
+  --bg-now: #ece7d9;
+  --ink-now: #12332d;
+  --card-now: rgba(255, 255, 255, 0.55);
+  --line-now: rgba(18, 51, 45, 0.18);
+}
+
+html {
+  background: var(--bg-now);
+  color: var(--ink-now);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+:focus-visible {
+  outline: 2.5px solid var(--color-coral);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+}
