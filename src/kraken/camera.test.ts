@@ -36,4 +36,6 @@ test('the waterline sits at 68% on the surface and is off-screen in the deep', (
   expect(waterTop(0)).toBe(68);
   expect(waterTop(1)).toBe(68);
   expect(waterTop(0.5)).toBeLessThan(0);
+  expect(waterTop(0, 0.46)).toBe(78); // lower on phones, so the text above stays clear
+  expect(krakenPlacement(0, 0.46).scale).toBeLessThan(1);
 });

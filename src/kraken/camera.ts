@@ -14,6 +14,9 @@ export function cameraAt(p: number): { pos: [number, number, number]; look: [num
 }
 
 const PEEK_Y = -0.77; // eyes just above the waterline
+const PEEK_Y_TALL = -1.11; // phones: a smaller kraken under a lower waterline, clear of the text
+const PEEK_SCALE_TALL = 0.62;
+export const isTall = (aspect: number) => Number.isFinite(aspect) && aspect > 0 && aspect < 0.9;
 export type Placement = { x: number; y: number; z: number; scale: number };
 
 /** `aspect` = viewport width / height: on narrow screens the kraken stays nearer the middle. */
@@ -26,26 +29,29 @@ export function krakenPlacement(p: number, aspect: number): Placement {
   const leave = span(c, R.creature[1], R.floor[0] + 0.05); // moves aside on the sea floor
   const rise = span(c, R.ascent[0], R.surfaceAgain[0] + 0.03); // back to the surface
 
-  if (c < R.descent[0] + 0.03) {
-    return { x: sideX, y: mix(PEEK_Y, -4.5, duck), z: 0, scale: 1 };
-  }
   // On a tall (phone) screen the card sits below, so the kraken sits higher and smaller.
-  const tall = a < 0.9;
+  const tall = isTall(a);
+  const peekY = tall ? PEEK_Y_TALL : PEEK_Y;
+  const peekScale = tall ? PEEK_SCALE_TALL : 1;
+  if (c < R.descent[0] + 0.03) {
+    return { x: sideX, y: mix(peekY, -4.5, duck), z: 0, scale: peekScale };
+  }
   const midY = tall ? 1.25 : 0;
   const midScale = tall ? 0.6 : 1;
   if (c < R.creature[1]) {
     return { x: mix(sideX * 1.5, 0, arrive * arrive), y: mix(-3.2, midY, arrive), z: mix(-9, 0, arrive), scale: mix(1, midScale, arrive) };
   }
   if (c < R.ascent[0]) {
-    return { x: mix(0, sideX, leave), y: mix(midY, -0.9, leave), z: mix(0, -1.5, leave), scale: mix(midScale, 0.8, leave) };
+    return { x: mix(0, sideX * 1.18, leave), y: mix(midY, -0.9, leave), z: mix(0, -1.5, leave), scale: mix(midScale, 0.8, leave) };
   }
-  return { x: sideX, y: mix(-0.9, PEEK_Y, rise), z: mix(-1.5, 0, rise), scale: mix(0.8, 1, rise) };
+  return { x: mix(sideX * 1.18, sideX, rise), y: mix(-0.9, peekY, rise), z: mix(-1.5, 0, rise), scale: mix(0.8, peekScale, rise) };
 }
 
 /** Top edge of the water, in vh from the top of the screen. */
-export function waterTop(p: number): number {
+export function waterTop(p: number, aspect = 1.6): number {
   const c = clamp01(p);
+  const rest = isTall(aspect) ? 78 : 68;
   const down = span(c, R.surface[1] - 0.03, R.waterline[1] - 0.02);
   const up = span(c, R.ascent[0] + 0.01, R.surfaceAgain[0] + 0.03);
-  return mix(68, -25, clamp01(down - up));
+  return mix(rest, -25, clamp01(down - up));
 }

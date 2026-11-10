@@ -7,9 +7,9 @@ import { clamp01 } from './stages';
 gsap.registerPlugin(ScrollTrigger);
 
 /** Mount once: one ScrollTrigger over the whole page writes progress into the store. */
-export function useScrollProgress(root: React.RefObject<HTMLElement | null>) {
+export function useScrollProgress(root: React.RefObject<HTMLElement | null>, enabled = true) {
   useEffect(() => {
-    if (!root.current) return;
+    if (!root.current || !enabled) return;
     // Whole-document progress. 'max' is re-measured on every refresh, so late layout
     // (fonts, the lazy 3D scene) cannot leave a stale end point.
     const st = ScrollTrigger.create({
@@ -23,7 +23,7 @@ export function useScrollProgress(root: React.RefObject<HTMLElement | null>) {
       cancelAnimationFrame(raf);
       st.kill();
     };
-  }, [root]);
+  }, [root, enabled]);
 }
 
 /** Smoothly scroll the page to a progress value (used by the depth gauge). */

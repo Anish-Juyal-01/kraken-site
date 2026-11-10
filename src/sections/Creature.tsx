@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ARMS, DELIVER, SPARK, STORM, type Arm } from '../content/content';
 import { scrollStore } from '../scroll/store';
-import { armIndexAt } from '../scroll/stages';
+import { armIndexAt, progressOfArm } from '../scroll/stages';
 import { Button } from '../ui/Button';
 import { ChatCard } from '../ui/ChatCard';
 import { Stage } from '../ui/Stage';
@@ -122,5 +122,20 @@ export function Creature() {
         </div>
       )}
     </Stage>
+  );
+}
+
+/** Reduced motion: the same eight cards as an ordinary list, one screen each. */
+export function CreatureList() {
+  return (
+    <div id="creature" className="relative z-[2]">
+      {ARMS.map((arm, i) => (
+        <section key={arm.id} data-progress={progressOfArm(i)} className="relative flex min-h-[100dvh] items-end px-4 pb-10 pt-[46dvh] md:items-center md:p-0">
+          <div className={`w-full md:absolute md:top-1/2 md:w-[min(410px,32vw)] md:-translate-y-1/2 ${i % 2 === 0 ? 'md:right-[8.5vw]' : 'md:left-[6vw]'}`}>
+            <ArmCard arm={arm} />
+          </div>
+        </section>
+      ))}
+    </div>
   );
 }

@@ -17,7 +17,7 @@ export function Water() {
         root.setProperty('--card-now', deep ? 'rgba(236, 231, 217, 0.07)' : 'rgba(255, 255, 255, 0.6)');
         root.setProperty('--line-now', deep ? 'rgba(236, 231, 217, 0.22)' : 'rgba(18, 51, 45, 0.18)');
         if (sheet.current) {
-          sheet.current.style.transform = `translate3d(0, ${waterTop(p)}vh, 0)`;
+          sheet.current.style.transform = `translate3d(0, ${waterTop(p, window.innerWidth / window.innerHeight)}vh, 0)`;
           sheet.current.style.opacity = String(1 - depthMix(p));
         }
       }),

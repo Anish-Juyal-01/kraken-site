@@ -1,11 +1,13 @@
-import { Suspense, lazy, useCallback, useRef } from 'react';
+import { Suspense, lazy, useCallback, useMemo, useRef, useState } from 'react';
 import { moodFor } from './kraken/moods';
 import { posesFor, ringFor } from './kraken/poses';
 import type { KrakenState } from './kraken/state';
 import { armIndexAt, armLocal } from './scroll/stages';
 import { useScrollProgress } from './scroll/useScrollProgress';
+import { useFlowProgress } from './scroll/useFlowProgress';
+import { detectDevice, qualityFor } from './kraken/quality';
 import { Ascent } from './sections/Ascent';
-import { Creature } from './sections/Creature';
+import { Creature, CreatureList } from './sections/Creature';
 import { Descent } from './sections/Descent';
 import { Floor } from './sections/Floor';
 import { Surface } from './sections/Surface';
@@ -23,7 +25,12 @@ const smooth = (t: number) => t * t * (3 - 2 * t);
 export default function App() {
   const root = useRef<HTMLDivElement>(null);
   const shift = useRef({ x: 0, t: 0 });
-  useScrollProgress(root);
+  const [device, setDevice] = useState(detectDevice);
+  const quality = useMemo(() => qualityFor(device), [device]);
+  // Reduced motion or no 3D: an ordinary page, no pinning, no scrubbing.
+  const flow = quality.mode === 'still' || quality.mode === 'none';
+  useScrollProgress(root, !flow);
+  useFlowProgress(flow);
 
   /** Once per frame: turn scroll position and what the visitor did into the kraken's pose. */
   const direct = useCallback((s: KrakenState, p: number, now: number) => {
@@ -32,7 +39,7 @@ export default function App() {
     const atSurface = p < 0.07 || p > 0.955;
     s.activeArm = arm;
     s.poses = posesFor(arm, arm === null ? 0 : smooth(Math.min(1, armLocal(p) / 0.22)));
-    s.ring = ringFor(arm, wide);
+    s.ring = ringFor(arm, true); // to the side even on phones: an arm raised in front hides the face
     if (atSurface) {
       // peeking over the waterline: one arm is up out of the water, ready to wave
       s.poses[7] = { reach: 0.62, curl: 0.12, lift: 1 };
@@ -53,20 +60,22 @@ export default function App() {
 
   return (
     <div ref={root} className="relative">
-      <Suspense fallback={null}>
-        <Scene direct={direct} />
-      </Suspense>
+      {quality.mode !== 'none' && (
+        <Suspense fallback={null}>
+          <Scene quality={quality} direct={direct} onLost={() => setDevice((d) => ({ ...d, webgl: false }))} />
+        </Suspense>
+      )}
       <Water />
       <main>
-        <Surface flow={false} />
-        <Waterline flow={false} />
-        <Descent flow={false} />
-        <Creature />
-        <Floor flow={false} />
-        <Ascent flow={false} />
-        <SurfaceAgain flow={false} />
+        <Surface flow={flow} />
+        <Waterline flow={flow} />
+        <Descent flow={flow} />
+        {flow ? <CreatureList /> : <Creature />}
+        <Floor flow={flow} />
+        <Ascent flow={flow} />
+        <SurfaceAgain flow={flow} />
       </main>
-      <DepthGauge />
+      {!flow && <DepthGauge />}
     </div>
   );
 }

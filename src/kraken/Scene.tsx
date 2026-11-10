@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ARMS } from '../content/content';
 import { scrollStore } from '../scroll/store';
+import { interactions } from '../sections/interactions';
 import { Bubbles } from './Bubbles';
 import { cameraAt, krakenPlacement } from './camera';
 import { depthColor } from './depth';
@@ -11,7 +12,7 @@ import { Prop } from './props';
 import { FULL, type Quality } from './quality';
 import { initialState, type KrakenState } from './state';
 
-type Props = { quality?: Quality; direct?: (state: KrakenState, p: number, now: number) => void };
+type Props = { quality?: Quality; direct?: (state: KrakenState, p: number, now: number) => void; onLost?: () => void };
 
 const fogColor = new THREE.Color();
 
@@ -35,11 +36,31 @@ function Director({ state, direct }: { state: KrakenState; direct?: Props['direc
   return null;
 }
 
+/** Still mode: draw one frame whenever the section or the visitor's choices change. */
+function Redraw() {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => {
+    const again = () => {
+      invalidate();
+      setTimeout(invalidate, 60); // a second frame lets poses that snap settle
+    };
+    const a = scrollStore.subscribe(again);
+    const b = interactions.subscribe(again);
+    return () => {
+      a();
+      b();
+    };
+  }, [invalidate]);
+  return null;
+}
+
 /** The fixed 3D layer behind the page. */
-export default function Scene({ quality = FULL, direct }: Props) {
+export default function Scene({ quality = FULL, direct, onLost }: Props) {
   const state = useMemo(() => initialState(), []);
+  if (import.meta.env.DEV) (window as unknown as { __k: KrakenState }).__k = state;
 
   useEffect(() => {
+    if (!quality.loop) return; // a still scene does not follow the cursor
     const onMove = (e: PointerEvent) => {
       state.look = [(e.clientX / window.innerWidth) * 2 - 1, -((e.clientY / window.innerHeight) * 2 - 1)];
       state.lean = state.look;
@@ -47,7 +68,7 @@ export default function Scene({ quality = FULL, direct }: Props) {
     };
     window.addEventListener('pointermove', onMove, { passive: true });
     return () => window.removeEventListener('pointermove', onMove);
-  }, [state]);
+  }, [state, quality.loop]);
 
   return (
     <Canvas
@@ -57,7 +78,9 @@ export default function Scene({ quality = FULL, direct }: Props) {
       camera={{ fov: 32, position: [0, 0.5, 8.5], near: 0.1, far: 60 }}
       gl={{ alpha: true, antialias: true }}
       frameloop={quality.loop ? 'always' : 'demand'}
+      onCreated={({ gl }) => gl.domElement.addEventListener('webglcontextlost', () => onLost?.(), { once: true })}
     >
+      {!quality.loop && <Redraw />}
       <fog attach="fog" args={['#ece7d9', 9, 19]} />
       <ambientLight intensity={1.5} />
       <directionalLight position={[-3, 5, 6]} intensity={2.2} />

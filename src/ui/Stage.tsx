@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { scrollStore } from '../scroll/store';
 import { localProgress, type SectionId } from '../scroll/stages';
-import { sectionHeight } from '../scroll/layout';
+import { FLOW_PROGRESS, sectionHeight } from '../scroll/layout';
 
 type Props = {
   id: SectionId;
@@ -37,7 +37,7 @@ export function Stage({ id, children, className = '', fadeIn = true, fadeOut = t
 
   if (flow)
     return (
-      <section id={id} data-section={id} className={`relative z-[2] min-h-[100dvh] ${className}`}>
+      <section id={id} data-section={id} data-progress={FLOW_PROGRESS[id]} className={`relative z-[2] min-h-[100dvh] ${className}`}>
         {children}
       </section>
     );

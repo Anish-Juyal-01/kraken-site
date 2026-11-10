@@ -6,6 +6,7 @@ import type { KrakenState } from './state';
 import { COLORS, toonMaterial } from './toon';
 
 const BONE = '#ece7d9';
+const WQ = new THREE.Quaternion();
 
 function useMats() {
   return useMemo(
@@ -127,6 +128,10 @@ export function Prop({ kind, index, state }: { kind: PropKind; index: number; st
     const target = state.activeArm === index ? 1.15 : 0;
     size.current += (target - size.current) * (dt > 0.25 ? 1 : 1 - Math.exp(-dt * 6));
     if (g.current) {
+      // Keep the prop upright and facing the visitor whatever way the arm bends: a letter seen
+      // edge-on is just a line.
+      g.current.parent?.getWorldQuaternion(WQ);
+      g.current.quaternion.copy(WQ.invert());
       g.current.visible = size.current > 0.02;
       g.current.scale.setScalar(size.current);
     }
