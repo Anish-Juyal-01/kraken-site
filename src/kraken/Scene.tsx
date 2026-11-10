@@ -3,7 +3,6 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ARMS } from '../content/content';
 import { scrollStore } from '../scroll/store';
-import { interactions } from '../sections/interactions';
 import { Bubbles } from './Bubbles';
 import { cameraAt, krakenPlacement } from './camera';
 import { depthColor } from './depth';
@@ -36,24 +35,6 @@ function Director({ state, direct }: { state: KrakenState; direct?: Props['direc
   return null;
 }
 
-/** Still mode: draw one frame whenever the section or the visitor's choices change. */
-function Redraw() {
-  const invalidate = useThree((s) => s.invalidate);
-  useEffect(() => {
-    const again = () => {
-      invalidate();
-      setTimeout(invalidate, 60); // a second frame lets poses that snap settle
-    };
-    const a = scrollStore.subscribe(again);
-    const b = interactions.subscribe(again);
-    return () => {
-      a();
-      b();
-    };
-  }, [invalidate]);
-  return null;
-}
-
 /** The fixed 3D layer behind the page. */
 export default function Scene({ quality = FULL, direct, onLost }: Props) {
   const state = useMemo(() => initialState(), []);
@@ -77,10 +58,8 @@ export default function Scene({ quality = FULL, direct, onLost }: Props) {
       dpr={[1, quality.mode === 'full' ? 2 : 1.5]}
       camera={{ fov: 32, position: [0, 0.5, 8.5], near: 0.1, far: 60 }}
       gl={{ alpha: true, antialias: true }}
-      frameloop={quality.loop ? 'always' : 'demand'}
       onCreated={({ gl }) => gl.domElement.addEventListener('webglcontextlost', () => onLost?.(), { once: true })}
     >
-      {!quality.loop && <Redraw />}
       <fog attach="fog" args={['#ece7d9', 9, 19]} />
       <ambientLight intensity={1.5} />
       <directionalLight position={[-3, 5, 6]} intensity={2.2} />
