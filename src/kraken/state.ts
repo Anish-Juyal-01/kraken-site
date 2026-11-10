@@ -9,9 +9,12 @@ export type KrakenState = {
   lean: [number, number];
   ring: number; // rotation of the ring of arms, radians
   activeArm: number | null;
+  x: number;
   y: number;
+  z: number;
   scale: number;
   wave: number; // 0..1 strength of the idle wave on the last arm
+  lastMove: number; // performance.now() of the last pointer move
 };
 
 export const REST: ArmPose = { reach: 0.45, curl: 0.55, lift: 0 };
@@ -24,8 +27,11 @@ export function initialState(): KrakenState {
     lean: [0, 0],
     ring: 0,
     activeArm: null,
+    x: 0,
     y: 0,
+    z: 0,
     scale: 1,
     wave: 0,
+    lastMove: 0,
   };
 }

@@ -46,3 +46,26 @@ body {
   letter-spacing: -0.02em;
   line-height: 1.02;
 }
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+}
+.card-in > * {
+  animation: card-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-in > * {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-now) transparent;
+}

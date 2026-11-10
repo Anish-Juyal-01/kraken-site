@@ -10,14 +10,19 @@ gsap.registerPlugin(ScrollTrigger);
 export function useScrollProgress(root: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
     if (!root.current) return;
+    // Whole-document progress. 'max' is re-measured on every refresh, so late layout
+    // (fonts, the lazy 3D scene) cannot leave a stale end point.
     const st = ScrollTrigger.create({
-      trigger: root.current,
-      start: 'top top',
-      end: 'bottom bottom',
+      start: 0,
+      end: 'max',
       onUpdate: (self) => scrollStore.set(clamp01(self.progress), self.getVelocity()),
       onRefresh: (self) => scrollStore.set(clamp01(self.progress), 0),
     });
-    return () => st.kill();
+    const raf = requestAnimationFrame(() => ScrollTrigger.refresh());
+    return () => {
+      cancelAnimationFrame(raf);
+      st.kill();
+    };
   }, [root]);
 }
 

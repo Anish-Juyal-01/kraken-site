@@ -30,7 +30,7 @@ export function armPoints(index: number, time: number, pose: ArmPose, lean: [num
   const a = armAngle(index);
   const dx = Math.cos(a);
   const dz = Math.sin(a);
-  const length = 0.9 + 1.5 * reach;
+  const length = 0.9 + 1.15 * reach;
   const ds = length / segments;
 
   let r = ARM_RING;

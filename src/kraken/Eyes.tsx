@@ -44,11 +44,12 @@ export function Eyes({ mood, look, animate }: Props) {
       const p = pupils.current[i];
       if (p) {
         p.position.set(lx * 0.1, ly * 0.09, 0);
-        p.scale.setScalar(m.pupil);
+        // scale the pupil in place: scaling the whole group would pull it inside the eyeball
+        p.children[0].scale.set(0.135 * m.pupil, 0.15 * m.pupil, 0.05);
       }
       const l = lids.current[i];
       // The lid is the top half of a sphere, tipped back out of sight when open.
-      if (l) l.rotation.x = -1.35 + lid * 1.5;
+      if (l) l.rotation.x = -1.8 + lid * 1.9;
     }
   });
 
