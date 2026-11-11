@@ -8,8 +8,7 @@ const mix = (a: number, b: number, t: number) => a + (b - a) * t;
 export function cameraAt(p: number): { pos: [number, number, number]; look: [number, number, number] } {
   const c = clamp01(p);
   const down = span(c, R.waterline[0], R.creature[0]);
-  const up = span(c, R.ascent[0], R.surfaceAgain[0] + 0.02);
-  const d = clamp01(down - up);
+  const d = down; // no trip back up: the page ends on the ocean bed
   return { pos: [0, mix(0.5, 0.25, d), mix(8.5, 9.2, d)], look: [0, mix(0.5, 0.15, d), 0] };
 }
 
@@ -37,7 +36,7 @@ export function krakenPlacement(p: number, aspect: number): Placement {
   const duck = span(c, R.surface[1] - 0.02, R.waterline[1]); // hides under the water
   const arrive = span(c, R.descent[0] + 0.03, R.creature[0]); // swims up from far below
   const leave = span(c, R.creature[1], R.floor[0] + 0.05); // moves aside on the sea floor
-  const rise = span(c, R.ascent[0], R.surfaceAgain[0] + 0.03); // back to the surface
+  const settle = span(c, R.ascent[0], R.surfaceAgain[0] + 0.03); // settles lower, by the run steps
 
   // On a tall (phone) screen the card sits below, so the kraken sits higher and smaller.
   const tall = isTall(a);
@@ -58,7 +57,8 @@ export function krakenPlacement(p: number, aspect: number): Placement {
   if (c < R.ascent[0]) {
     return { x: mix(0, sideX * 1.18, leave), y: mix(midY, -0.9, leave), z: mix(0, -1.5, leave), scale: mix(midScale, 0.8, leave) };
   }
-  return { x: mix(sideX * 1.18, 0, rise), y: mix(-0.9, peekY, rise), z: mix(-1.5, 0, rise), scale: mix(0.8, peekScale, rise) };
+  if (tall) return { x: 0, y: mix(-0.9, 1.25, settle), z: mix(-1.5, 0, settle), scale: mix(0.8, 0.55, settle) };
+  return { x: sideX * 1.18, y: mix(-0.9, -1.3, settle), z: -1.5, scale: 0.8 };
 }
 
 /** Top edge of the water, in vh from the top of the screen. */
@@ -66,8 +66,5 @@ export function waterTop(p: number, aspect = 1.6): number {
   const c = clamp01(p);
   const tall = isTall(aspect);
   const down = span(c, R.surface[1] - 0.03, R.waterline[1] - 0.02);
-  const up = span(c, R.ascent[0] + 0.01, R.surfaceAgain[0] + 0.03);
-  // the first screen may rest the waterline elsewhere; the last screen always uses 68 (78 on phones)
-  if (c < 0.5) return mix(tall ? 78 : hero.water, -25, down);
-  return mix(-25, tall ? 78 : 68, up);
+  return mix(tall ? 78 : hero.water, -25, down); // the water closes over and stays closed
 }

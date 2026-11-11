@@ -15,6 +15,8 @@ export type KrakenState = {
   scale: number;
   wave: number; // 0..1 strength of the idle wave on the last arm
   lastMove: number; // performance.now() of the last pointer move
+  cursor: [number, number]; // pointer position, -1..1 across the screen
+  ringNow: number; // how far the ring of arms is turned right now
 };
 
 export const REST: ArmPose = { reach: 0.5, curl: 0.78, lift: 0.04 };
@@ -33,5 +35,7 @@ export function initialState(): KrakenState {
     scale: 1,
     wave: 0,
     lastMove: 0,
+    cursor: [0, 0.15],
+    ringNow: 0,
   };
 }

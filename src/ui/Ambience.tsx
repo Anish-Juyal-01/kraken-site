@@ -53,7 +53,7 @@ export function Ambience() {
           layer.current.style.display = d <= 0.001 ? 'none' : '';
         }
         if (floor.current) {
-          const up = smooth(Math.min(1, localProgress(p, 'floor') / 0.3)) * (1 - smooth(Math.max(0, (localProgress(p, 'ascent') - 0.1) / 0.6)));
+          const up = smooth(Math.min(1, localProgress(p, 'floor') / 0.3)); // rises once, stays to the end
           floor.current.style.transform = `translate3d(0, ${(1 - up) * 105}%, 0)`;
         }
       }),

@@ -179,3 +179,51 @@ body {
     animation: none;
   }
 }
+
+/* ---- the submarine on the ocean bed ---- */
+@keyframes sub-bob {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, 7px, 0);
+  }
+}
+.sub-bob {
+  animation: sub-bob 5.2s ease-in-out infinite;
+}
+@keyframes sub-prop {
+  to {
+    transform: scaleY(-1);
+  }
+}
+.sub-prop {
+  animation: sub-prop 0.5s ease-in-out infinite alternate;
+}
+@keyframes sub-bubble {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.7;
+  }
+  to {
+    transform: translate3d(-46px, -70px, 0);
+    opacity: 0;
+  }
+}
+.sub-bubble {
+  animation: sub-bubble 2.4s ease-out infinite;
+}
+.sub-bubble-b {
+  animation-delay: -0.8s;
+}
+.sub-bubble-c {
+  animation-delay: -1.6s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sub-bob,
+  .sub-prop,
+  .sub-bubble {
+    animation: none;
+  }
+}

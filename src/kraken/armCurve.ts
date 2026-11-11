@@ -20,13 +20,14 @@ export function armRadius(t: number): number {
   return 0.22 + (0.05 - 0.22) * Math.pow(x, 0.85);
 }
 
-export function armPoints(index: number, time: number, pose: ArmPose, lean: [number, number], segments: number, lengthScale = 1): Vec3[] {
+export function armPoints(index: number, time: number, pose: ArmPose, lean: [number, number, number?], segments: number, lengthScale = 1): Vec3[] {
   const reach = c01(pose.reach);
   const curl = c01(pose.curl);
   const lift = c01(pose.lift);
   const t = fin(time);
   const lx = Math.max(-1, Math.min(1, fin(lean[0])));
   const ly = Math.max(-1, Math.min(1, fin(lean[1])));
+  const lz = Math.max(-1, Math.min(1, fin(lean[2] ?? 0)));
   const a = armAngle(index);
   const dx = Math.cos(a);
   const dz = Math.sin(a);
@@ -40,11 +41,11 @@ export function armPoints(index: number, time: number, pose: ArmPose, lean: [num
     const s = k / segments;
     const sway = Math.sin(t * 1.3 + index * 0.9 + s * 3) * 0.14 * s;
     const side = Math.sin(t * 0.9 + index * 1.7 + s * 2) * 0.1 * s; // out of the arm's plane
-    const lean2 = s * s * 0.55;
+    const lean2 = s * s * 0.7;
     pts.push([
       dx * r - dz * side + lx * lean2,
       y + ly * lean2,
-      dz * r + dx * side,
+      dz * r + dx * side + lz * lean2,
     ]);
     const theta = -1.0 + lift * 1.5 + (0.6 + 2.6 * curl) * Math.pow(s, 1.4) + sway;
     r += Math.cos(theta) * ds;

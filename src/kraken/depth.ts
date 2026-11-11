@@ -12,8 +12,7 @@ const span = (p: number, a: number, b: number) => smooth(clamp01((p - a) / (b - 
 export function depthMix(p: number): number {
   const c = clamp01(p);
   const down = span(c, SECTION_RANGES.waterline[0], SECTION_RANGES.waterline[1] + 0.04);
-  const up = span(c, SECTION_RANGES.ascent[0], SECTION_RANGES.ascent[1] + 0.02);
-  return clamp01(down - up);
+  return down; // once under, the page stays under: it ends on the ocean bed
 }
 
 function hex(n: number) {

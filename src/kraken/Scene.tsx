@@ -32,6 +32,18 @@ function Director({ state, direct }: { state: KrakenState; direct?: Props['direc
     fogColor.set(depthColor(p));
     (scene.fog as THREE.Fog).color.copy(fogColor);
     direct?.(state, p, clock.elapsedTime);
+    // Where is the cursor, in the kraken's own plane? Eyes and arms aim from the head, not from
+    // the middle of the screen.
+    const lens = camera as THREE.PerspectiveCamera;
+    const dist = Math.max(0.1, lens.position.z - state.z);
+    const halfH = Math.tan((lens.fov * Math.PI) / 360) * dist;
+    const cx = lens.position.x + state.cursor[0] * halfH * (size.width / size.height);
+    const cy = lens.position.y + state.cursor[1] * halfH;
+    const dx = cx - state.x;
+    const dy = cy - (state.y + 0.6 * state.scale);
+    const cl = (n: number) => Math.max(-1, Math.min(1, n));
+    state.look = [cl(dx / 2.2), cl(dy / 1.8)];
+    state.lean = [cl(dx / (1.9 * state.scale)), cl((dy + 0.9 * state.scale) / (1.9 * state.scale))];
   });
   return null;
 }
@@ -44,8 +56,7 @@ export default function Scene({ quality = FULL, look = lookById(null), direct, o
   useEffect(() => {
     if (!quality.loop) return; // a still scene does not follow the cursor
     const onMove = (e: PointerEvent) => {
-      state.look = [(e.clientX / window.innerWidth) * 2 - 1, -((e.clientY / window.innerHeight) * 2 - 1)];
-      state.lean = state.look;
+      state.cursor = [(e.clientX / window.innerWidth) * 2 - 1, -((e.clientY / window.innerHeight) * 2 - 1)];
       state.lastMove = performance.now();
     };
     window.addEventListener('pointermove', onMove, { passive: true });

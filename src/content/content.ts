@@ -141,7 +141,7 @@ export const SWITCH_ROWS: { feature: string; use: string }[] = [
 
 export const ANY = 'Any repo: @kraken connect <url>. Any agent: whatever you add in Switch joins the crew on its own.';
 
-export const ASCENT = 'One thumbs-up from a person, and the work comes up for air.';
+export const ASCENT = 'One thumbs-up from a person, and the pull request opens.';
 
 export const RUN_STEPS = [
   'git clone https://github.com/Anish-Juyal-01/Kraken.git && cd Kraken',

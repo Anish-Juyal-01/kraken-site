@@ -41,6 +41,7 @@ export function Kraken({ look, state, quality, renderProp }: Props) {
       if (d > Math.PI) d -= Math.PI * 2;
       if (d < -Math.PI) d += Math.PI * 2;
       arms.current.rotation.y += d * (snap ? 1 : 1 - Math.exp(-dt * 3.5));
+      state.ringNow = arms.current.rotation.y;
     }
   });
 

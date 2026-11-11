@@ -118,7 +118,12 @@ export function Arm({ index, look, state, quality, children }: Props) {
     // The eighth arm is the visitor's: it follows the cursor fully. The others only lean a little.
     const k = isLast ? 1 : 0.2;
     const waveX = isLast ? Math.sin(t * 5.2) * 0.9 * state.wave : 0;
-    const lean: [number, number] = [state.lean[0] * k + waveX, state.lean[1] * k];
+    // The lean is a direction on screen. The ring of arms may be turned, so turn the lean back
+    // into the ring's own axes: otherwise a turned arm reaches the wrong way.
+    const wx = state.lean[0] * k + waveX;
+    const cr = Math.cos(state.ringNow);
+    const sr = Math.sin(state.ringNow);
+    const lean: [number, number, number] = [wx * cr, state.lean[1] * k, wx * sr];
     // resting arms curl as much as this look likes; the arm in front keeps its own pose
     const pose = state.activeArm === index || state.poses[index].lift > 0.5 ? state.poses[index] : { ...state.poses[index], curl: look.arm.restCurl };
     const pts = armPoints(index, t, pose, lean, segments, look.arm.length);

@@ -42,19 +42,20 @@ export default function App() {
   const direct = useCallback((s: KrakenState, p: number, now: number) => {
     const arm = armIndexAt(p);
     const wide = window.innerWidth / window.innerHeight > 0.9;
-    const atSurface = p < 0.07 || p > 0.955;
+    const atSurface = p < 0.07;
+    const atEnd = p > 0.93; // on the ocean bed, by the submarine
     s.activeArm = arm;
     s.poses = posesFor(arm, arm === null ? 0 : smooth(Math.min(1, armLocal(p) / 0.22)));
     s.ring = ringFor(arm, true); // to the side even on phones: an arm raised in front hides the face
-    if (atSurface) {
+    if (atSurface || atEnd) {
       // peeking over the waterline: one arm is up out of the water, ready to wave
       s.poses[7] = { reach: 0.62, curl: 0.12, lift: 1 };
       s.ring = armAngle(7) - 0.12; // out to the side, clear of the face
     }
     const it = interactions.get();
-    s.mood = atSurface ? 'curious' : moodFor(arm, it.storm, it.delivered);
+    s.mood = atSurface ? 'curious' : atEnd ? 'proud' : moodFor(arm, it.storm, it.delivered);
     const idle = (performance.now() - s.lastMove) / 1000;
-    const canWave = atSurface || arm === 7;
+    const canWave = atSurface || atEnd || arm === 7;
     s.wave = canWave && idle > 4 && (idle - 4) % 5 < 1.2 ? 1 : 0;
     // Step aside so the card and the kraken share the screen instead of overlapping.
     const dt = Math.min(1, Math.max(0, now - shift.current.t));
