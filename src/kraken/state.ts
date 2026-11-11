@@ -17,6 +17,8 @@ export type KrakenState = {
   lastMove: number; // performance.now() of the last pointer move
   cursor: [number, number]; // pointer position, -1..1 across the screen
   ringNow: number; // how far the ring of arms is turned right now
+  flinch: number; // 0..1, arms pulled in after a fright
+  cheer: number; // 0..1, arms thrown up when something went well
 };
 
 export const REST: ArmPose = { reach: 0.5, curl: 0.78, lift: 0.04 };
@@ -37,5 +39,7 @@ export function initialState(): KrakenState {
     lastMove: 0,
     cursor: [0, 0.15],
     ringNow: 0,
+    flinch: 0,
+    cheer: 0,
   };
 }

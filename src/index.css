@@ -276,3 +276,31 @@ body {
     animation: none;
   }
 }
+
+/* sky: the sun's rays turn slowly, gulls flap */
+@keyframes sun-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.sun-rays {
+  animation: sun-turn 90s linear infinite;
+}
+@keyframes gull-flap {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.35);
+  }
+}
+.gull {
+  animation: gull-flap 1.3s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sun-rays,
+  .gull {
+    animation: none;
+  }
+}

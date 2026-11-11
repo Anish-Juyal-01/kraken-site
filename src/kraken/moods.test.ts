@@ -18,7 +18,11 @@ test('mood per stage', () => {
   expect(moodFor(3, 'idle', false)).toBe('concentrating');
   expect(moodFor(4, 'idle', false)).toBe('neutral');
   expect(moodFor(4, 'error', false)).toBe('startled');
-  expect(moodFor(4, 'fixing', false)).toBe('startled');
+  expect(moodFor(4, 'sent', false)).toBe('concentrating');
+  expect(moodFor(4, 'fixing', false)).toBe('concentrating');
+  expect(moodFor(0, 'idle', false, 'yours')).toBe('proud');
+  expect(moodFor(0, 'idle', false, 'agent')).toBe('relieved');
+  expect(moodFor(0, 'idle', false, 'timeout')).toBe('startled');
   expect(moodFor(4, 'fixed', false)).toBe('relieved');
   expect(moodFor(5, 'idle', false)).toBe('neutral');
   expect(moodFor(5, 'idle', true)).toBe('proud');

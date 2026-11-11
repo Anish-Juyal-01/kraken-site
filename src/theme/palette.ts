@@ -113,7 +113,7 @@ export const PALETTES: Palette[] = [
 ];
 
 const fromUrl = typeof location === 'undefined' ? null : new URLSearchParams(location.search).get('palette');
-export const PALETTE: Palette = PALETTES.find((p) => p.id === fromUrl) ?? PALETTES[0];
+export const PALETTE: Palette = PALETTES.find((p) => p.id === fromUrl) ?? PALETTES.find((p) => p.id === 'reef')!;
 
 /** Publish the palette as CSS variables. Tailwind's colour utilities read the same names. */
 export function applyPalette(p: Palette = PALETTE) {

@@ -1,4 +1,4 @@
-import type { StormPhase } from '../sections/interactions';
+import type { SparkState, StormPhase } from '../sections/interactions';
 
 export type MoodId = 'neutral' | 'curious' | 'concentrating' | 'startled' | 'relieved' | 'proud';
 /** lid 0 open..1 closed, pupil size factor, mouth -1 "o" .. 1 big smile, squash = body height factor. */
@@ -26,11 +26,18 @@ export function blendMood(a: Mood, b: Mood, k: number): Mood {
 }
 
 /** Which mood the kraken shows for the arm in front and what the visitor has done. */
-export function moodFor(arm: number | null, storm: StormPhase, delivered: boolean): MoodId {
-  if (arm === 0 || arm === 7) return 'curious';
+export function moodFor(arm: number | null, storm: StormPhase, delivered: boolean, spark: SparkState['phase'] = 'asking'): MoodId {
+  if (arm === 0) {
+    if (spark === 'yours') return 'proud'; // a person took the step
+    if (spark === 'agent') return 'relieved';
+    if (spark === 'timeout') return 'startled';
+    return 'curious';
+  }
+  if (arm === 7) return 'curious';
   if (arm === 3) return 'concentrating';
   if (arm === 4) {
-    if (storm === 'error' || storm === 'fixing') return 'startled';
+    if (storm === 'sent' || storm === 'fixing') return 'concentrating'; // bracing, then mending
+    if (storm === 'error') return 'startled';
     if (storm === 'fixed') return 'relieved';
   }
   if (arm === 5 && delivered) return 'proud';

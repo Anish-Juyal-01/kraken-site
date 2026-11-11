@@ -59,10 +59,9 @@ export default function App() {
       s.ring = armAngle(7) - 0.12; // out to the side, clear of the face
     }
     const it = interactions.get();
-    s.mood = atSurface ? 'curious' : atEnd ? 'proud' : moodFor(arm, it.storm, it.delivered);
-    const idle = (performance.now() - s.lastMove) / 1000;
-    const canWave = atSurface || atEnd || arm === 7;
-    s.wave = canWave && idle > 4 && (idle - 4) % 5 < 1.2 ? 1 : 0;
+    s.mood = atSurface ? 'curious' : atEnd ? 'proud' : moodFor(arm, it.storm, it.delivered, it.spark.phase);
+    // the raised arm waves hello, all the time it is up
+    s.wave = atSurface || atEnd || arm === 7 ? 1 : 0;
     // Step aside so the card and the kraken share the screen instead of overlapping.
     const dt = Math.min(1, Math.max(0, now - shift.current.t));
     shift.current.t = now;

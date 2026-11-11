@@ -106,26 +106,31 @@ export function Arm({ index, look, state, quality, children }: Props) {
   const suckerGeo = useMemo(() => new THREE.SphereGeometry(1, 12, 8), []);
   const suckers = useRef<THREE.InstancedMesh>(null);
   const tip = useRef<THREE.Group>(null);
+  const waveNow = useRef(0);
   const normals = useRef<Vec3[]>([]);
   const side = useMemo(() => {
     const a = armAngle(index);
     return new THREE.Vector3(-Math.sin(a), 0, Math.cos(a));
   }, [index]);
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, dt) => {
     const t = quality.loop ? clock.elapsedTime : 0;
     const isLast = index === 7;
-    // The eighth arm is the visitor's: it follows the cursor fully. The others only lean a little.
-    const k = isLast ? 1 : 0.2;
-    const waveX = isLast ? Math.sin(t * 5.2) * 0.9 * state.wave : 0;
-    // The lean is a direction on screen. The ring of arms may be turned, so turn the lean back
-    // into the ring's own axes: otherwise a turned arm reaches the wrong way.
-    const wx = state.lean[0] * k + waveX;
+    // The arms do not follow the cursor (the eyes do). The raised arm waves hello: a slow,
+    // friendly swing from the tip, eased in and out.
+    waveNow.current += (state.wave - waveNow.current) * Math.min(1, dt * 3);
+    const waveX = isLast ? (Math.sin(t * 4.4) * 0.75 + Math.sin(t * 8.8) * 0.12) * waveNow.current : 0;
+    // The swing is a direction on screen. The ring of arms may be turned, so turn it back into
+    // the ring's own axes: otherwise a turned arm waves the wrong way.
     const cr = Math.cos(state.ringNow);
     const sr = Math.sin(state.ringNow);
-    const lean: [number, number, number] = [wx * cr, state.lean[1] * k, wx * sr];
+    const lean: [number, number, number] = [waveX * cr, isLast ? waveNow.current * 0.85 : 0, waveX * sr]; // held high, clear of the water
     // resting arms curl as much as this look likes; the arm in front keeps its own pose
-    const pose = state.activeArm === index || state.poses[index].lift > 0.5 ? state.poses[index] : { ...state.poses[index], curl: look.arm.restCurl };
+    const own = state.activeArm === index || state.poses[index].lift > 0.5;
+    let pose = own ? state.poses[index] : { ...state.poses[index], curl: look.arm.restCurl };
+    // a fright pulls the arms in tight; good news throws the resting ones up
+    if (state.flinch > 0.01) pose = { ...pose, curl: pose.curl + (1 - pose.curl) * state.flinch * 0.8, reach: pose.reach * (1 - 0.35 * state.flinch) };
+    if (!own && state.cheer > 0.01) pose = { ...pose, lift: Math.max(pose.lift, 0.55 * state.cheer), reach: pose.reach + 0.25 * state.cheer };
     const pts = armPoints(index, t, pose, lean, segments, look.arm.length);
     const thick = look.arm.thick;
     S0.copy(side);
