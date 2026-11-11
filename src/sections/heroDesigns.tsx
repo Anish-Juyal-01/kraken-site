@@ -11,7 +11,7 @@ export const HERO_DESIGNS: { id: HeroId; name: string; blurb: string; stage: Her
   // mixes of Wordmark and Above-and-below
   { id: 'sunk', mix: true, name: 'Sunk wordmark', blurb: 'The waterline splits the screen and the giant KRAKEN straddles it: two thirds in the air, one third under. The second sentence waits below.', stage: { water: 50, x: 2.05, dy: 0, scale: 1 } },
   { id: 'mirror', mix: true, name: 'Mirror', blurb: 'KRAKEN stands on the water and its reflection hangs below, where the second sentence and the kraken are.', stage: { water: 52, x: 0.1, dy: -0.02, scale: 0.95 } },
-  { id: 'depths', mix: true, name: 'Name in the depths', blurb: 'Above: the team and its chat. Below: the name itself, huge and pale under the water, with the kraken in front of it.', stage: { water: 40, x: 0, dy: -0.66, scale: 0.82 } },
+  { id: 'depths', mix: true, name: 'Name in the depths', blurb: 'Above: the team and its chat. Below: the name itself, huge and pale under the water, with the kraken in front of it.', stage: { water: 40, x: 0, dy: -0.6, scale: 0.86 } },
   { id: 'voyage', name: 'Voyage', blurb: 'A small scene: a low sun, a boat carrying the team chat, and the kraken rising under it.', stage: { water: 55, x: 1.2, dy: -0.05, scale: 1.05 } },
 ];
 
@@ -289,20 +289,15 @@ export function DepthsFront() {
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[40vh] hidden md:block">
         <ChatChip chat={CHAT[0]} className="left-[5%] -top-[64px] buoy-a" tilt={-3} />
         <ChatChip chat={CHAT[1]} className="left-[23%] -top-[58px] buoy-b hidden xl:block" tilt={3} />
-        <ChatChip chat={CHAT[2]} className="right-[21%] -top-[60px] buoy-c hidden xl:block" tilt={-2} />
+        <ChatChip chat={CHAT[2]} className="right-[25%] -top-[60px] buoy-c hidden xl:block" tilt={-2} />
         <ChatChip chat={CHAT[3]} className="right-[4%] -top-[66px] buoy-b" tilt={4} />
       </div>
-      <div className="absolute inset-x-0 top-[76vh] mx-auto flex max-w-[1400px] flex-col items-center px-12 text-center text-paper">
+      {/* low on the screen, clear of the kraken; no buttons here, the menu and the last screen have the links */}
+      <div className="absolute inset-x-0 bottom-[4.5vh] mx-auto flex max-w-[1400px] flex-col items-center px-12 text-center text-paper">
         <p className="display" style={{ fontSize: 'clamp(30px, min(5.6vh, 3.8vw), 60px)' }}>
           {LINE2}
         </p>
         <p className="mt-[1.2vh] max-w-[70ch] text-[17px] leading-relaxed">{HERO.sub}</p>
-        <div className="mt-[1.8vh] flex flex-wrap justify-center gap-3">
-          <Button href={LINKS.demo}>Watch the demo</Button>
-          <a className={GHOST} href={LINKS.repo} target="_blank" rel="noreferrer">
-            View on GitHub
-          </a>
-        </div>
       </div>
     </>
   );
