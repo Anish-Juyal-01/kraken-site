@@ -4,9 +4,24 @@ import { progressOfArm } from '../scroll/stages';
 import { scrollToProgress } from '../scroll/useScrollProgress';
 import { Button } from '../ui/Button';
 import { Stage } from '../ui/Stage';
-import { PosterBack, PosterFront, SplitFront, VoyageBack, VoyageFront, WordmarkBack, WordmarkFront, heroById } from './heroDesigns';
+import {
+  DepthsBack,
+  DepthsFront,
+  MirrorBack,
+  MirrorFront,
+  PosterBack,
+  PosterFront,
+  SplitFront,
+  SunkBack,
+  SunkFront,
+  VoyageBack,
+  VoyageFront,
+  WordmarkBack,
+  WordmarkFront,
+  heroById,
+} from './heroDesigns';
 
-// ?hero=wordmark|split|poster|voyage picks the first-screen design.
+// ?hero=wordmark|split|poster|voyage|sunk|mirror|depths picks the first-screen design.
 export const HERO_DESIGN = heroById(new URLSearchParams(location.search).get('hero'));
 setHeroStage(HERO_DESIGN.stage); // where the waterline rests and the kraken waits, before the first frame
 
@@ -21,6 +36,9 @@ export function SurfaceBack() {
   if (HERO_DESIGN.id === 'wordmark') return <WordmarkBack />;
   if (HERO_DESIGN.id === 'poster') return <PosterBack />;
   if (HERO_DESIGN.id === 'voyage') return <VoyageBack />;
+  if (HERO_DESIGN.id === 'sunk') return <SunkBack />;
+  if (HERO_DESIGN.id === 'mirror') return <MirrorBack />;
+  if (HERO_DESIGN.id === 'depths') return <DepthsBack />;
   return null;
 }
 
@@ -28,6 +46,9 @@ function Front() {
   if (HERO_DESIGN.id === 'wordmark') return <WordmarkFront />;
   if (HERO_DESIGN.id === 'split') return <SplitFront />;
   if (HERO_DESIGN.id === 'poster') return <PosterFront />;
+  if (HERO_DESIGN.id === 'sunk') return <SunkFront />;
+  if (HERO_DESIGN.id === 'mirror') return <MirrorFront />;
+  if (HERO_DESIGN.id === 'depths') return <DepthsFront />;
   return <VoyageFront />;
 }
 

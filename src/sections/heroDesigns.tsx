@@ -2,12 +2,16 @@ import { HERO, LINKS } from '../content/content';
 import type { HeroStage } from '../kraken/camera';
 import { Button } from '../ui/Button';
 
-export type HeroId = 'wordmark' | 'split' | 'poster' | 'voyage';
+export type HeroId = 'wordmark' | 'split' | 'poster' | 'voyage' | 'sunk' | 'mirror' | 'depths';
 
-export const HERO_DESIGNS: { id: HeroId; name: string; blurb: string; stage: HeroStage }[] = [
+export const HERO_DESIGNS: { id: HeroId; name: string; blurb: string; stage: HeroStage; mix?: boolean }[] = [
   { id: 'wordmark', name: 'Wordmark', blurb: 'A giant KRAKEN half sunk in the sea, with the creature peeking through the letters.', stage: { water: 66, x: 0.15, dy: 0, scale: 1 } },
   { id: 'split', name: 'Above and below', blurb: 'The waterline cuts the screen in two: the team talks above, the kraken listens below.', stage: { water: 47, x: 1.75, dy: -1.25, scale: 1.05 } },
   { id: 'poster', name: 'Poster', blurb: 'Huge type that runs down into the water, so the second sentence is literally below the surface.', stage: { water: 60, x: 2.3, dy: 0.02, scale: 1.1 } },
+  // mixes of Wordmark and Above-and-below
+  { id: 'sunk', mix: true, name: 'Sunk wordmark', blurb: 'The waterline splits the screen and the giant KRAKEN straddles it: two thirds in the air, one third under. The second sentence waits below.', stage: { water: 50, x: 2.05, dy: 0, scale: 1 } },
+  { id: 'mirror', mix: true, name: 'Mirror', blurb: 'KRAKEN stands on the water and its reflection hangs below, where the second sentence and the kraken are.', stage: { water: 52, x: 0.1, dy: -0.02, scale: 0.95 } },
+  { id: 'depths', mix: true, name: 'Name in the depths', blurb: 'Above: the team and its chat. Below: the name itself, huge and pale under the water, with the kraken in front of it.', stage: { water: 42, x: 1.9, dy: -1.3, scale: 1.05 } },
   { id: 'voyage', name: 'Voyage', blurb: 'A small scene: a low sun, a boat carrying the team chat, and the kraken rising under it.', stage: { water: 55, x: 1.2, dy: -0.05, scale: 1.05 } },
 ];
 
@@ -188,6 +192,103 @@ export function VoyageFront() {
           </div>
         </div>
       </div>
+    </>
+  );
+}
+
+/* ---------- mixes of Wordmark and Above-and-below ---------- */
+
+const GHOST =
+  'inline-flex h-12 items-center rounded-full border-[1.5px] border-paper px-6 text-[15px] font-semibold text-paper transition-transform hover:-translate-y-0.5 active:scale-[0.98]';
+
+function Below({ top, big = true, align = 'left' }: { top: string; big?: boolean; align?: 'left' | 'center' }) {
+  const centre = align === 'center';
+  return (
+    <div className={`absolute inset-x-0 mx-auto max-w-[1400px] px-12 text-paper ${centre ? 'flex flex-col items-center text-center' : ''}`} style={{ top }}>
+      <p className={`display ${centre ? '' : 'max-w-[13ch]'}`} style={{ fontSize: big ? 'clamp(36px, min(7.6vh, 5.2vw), 84px)' : 'clamp(28px, min(5.2vh, 3.6vw), 56px)' }}>
+        {LINE2}
+      </p>
+      <p className="mt-[1.6vh] max-w-[44ch] text-[17px] leading-relaxed">{HERO.sub}</p>
+      <div className={`mt-[2vh] flex flex-wrap gap-3 ${centre ? 'justify-center' : ''}`}>
+        <Button href={LINKS.demo}>Watch the demo</Button>
+        <a className={GHOST} href={LINKS.repo} target="_blank" rel="noreferrer">
+          View on GitHub
+        </a>
+      </div>
+    </div>
+  );
+}
+
+/* 5. Sunk wordmark: the word straddles a half-way waterline */
+export function SunkBack() {
+  return (
+    <p className="display absolute inset-x-0 text-center leading-none text-ink" style={{ top: '50vh', fontSize: '25.5vw', transform: 'translateY(-64%)', letterSpacing: '-0.045em' }}>
+      KRAKEN
+    </p>
+  );
+}
+export function SunkFront() {
+  return (
+    <>
+      <div className="mx-auto max-w-[1400px] px-12 pt-[1.5vh]">
+        <h1 className="display" style={{ fontSize: 'clamp(30px, min(6vh, 3.9vw), 62px)' }}>
+          {LINE1}
+        </h1>
+      </div>
+      <Below top="66vh" big={false} />
+    </>
+  );
+}
+
+/* 6. Mirror: the word stands on the water, its reflection hangs below */
+export function MirrorBack() {
+  const word = { fontSize: '22vw', letterSpacing: '-0.045em' } as const;
+  return (
+    <>
+      <p className="display absolute inset-x-0 text-center leading-none text-ink" style={{ ...word, top: '52vh', transform: 'translateY(-84%)' }}>
+        KRAKEN
+      </p>
+      <p className="display absolute inset-x-0 text-center leading-none text-ink opacity-45" style={{ ...word, top: '52vh', transform: 'translateY(-16%) scaleY(-1) skewX(-3deg)' }}>
+        KRAKEN
+      </p>
+    </>
+  );
+}
+export function MirrorFront() {
+  return (
+    <>
+      <div className="mx-auto max-w-[1400px] px-12 pt-[1.5vh] text-center">
+        <h1 className="display" style={{ fontSize: 'clamp(28px, min(5.4vh, 3.5vw), 54px)' }}>
+          {LINE1}
+        </h1>
+      </div>
+      <Below top="72vh" big={false} align="center" />
+    </>
+  );
+}
+
+/* 7. Name in the depths: the team above, the name itself under the water */
+export function DepthsBack() {
+  return (
+    <p className="display absolute inset-x-0 text-center leading-none text-paper" style={{ top: '45vh', fontSize: '25.5vw', transform: 'translateY(-4%)', letterSpacing: '-0.045em' }}>
+      KRAKEN
+    </p>
+  );
+}
+export function DepthsFront() {
+  return (
+    <>
+      <div className="mx-auto max-w-[1400px] px-12 pt-[3vh]">
+        <h1 className="display max-w-[14ch]" style={{ fontSize: 'clamp(38px, min(8.6vh, 5.8vw), 96px)' }}>
+          {LINE1}
+        </h1>
+      </div>
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[42vh] hidden md:block">
+        <ChatChip chat={CHAT[0]} className="right-[31%] -top-[62px] buoy-a" tilt={-3} />
+        <ChatChip chat={CHAT[1]} className="right-[9%] -top-[70px] buoy-b" tilt={4} />
+        <ChatChip chat={CHAT[3]} className="right-[20%] -top-[148px] buoy-c hidden xl:block" tilt={-2} />
+      </div>
+      <Below top="68vh" big={false} />
     </>
   );
 }

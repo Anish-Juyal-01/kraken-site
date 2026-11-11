@@ -50,14 +50,16 @@ function Tile({ look, mood, reach, deep }: { look: Look; mood: MoodId; reach: bo
   );
 }
 
-/** ?lab=hero: the four first-screen designs, each one the real page in a small frame. */
-function HeroLab() {
+/** ?lab=hero: the first-screen designs, each one the real page in a small frame.
+ *  ?lab=mix shows only the mixes of Wordmark and Above-and-below. */
+function HeroLab({ mixes }: { mixes: boolean }) {
+  const list = HERO_DESIGNS.filter((h) => !!h.mix === mixes);
   return (
     <main className="min-h-[100dvh] bg-[#d9d3c4] px-5 py-8 text-ink md:px-10">
-      <h1 className="display text-4xl">Four first screens</h1>
+      <h1 className="display text-4xl">{mixes ? 'Wordmark meets Above and below' : 'Four first screens'}</h1>
       <p className="mt-2 max-w-[70ch] text-[16px] leading-relaxed">Each frame is the real page. Click a name to open that design full size.</p>
       <div className="mt-6 grid gap-6 md:grid-cols-2">
-        {HERO_DESIGNS.map((h) => (
+        {list.map((h) => (
           <figure key={h.id}>
             <div className="relative aspect-[16/9] overflow-hidden rounded-[var(--radius-card)] bg-paper">
               <iframe title={h.name} src={`./?hero=${h.id}`} className="absolute left-0 top-0 h-[900px] w-[1600px] origin-top-left border-0" style={{ transform: 'scale(var(--fit))' }} ref={fit} />
@@ -85,7 +87,8 @@ function fit(el: HTMLIFrameElement | null) {
 
 /** Four kraken designs side by side, so one can be picked. Open with ?lab in the address. */
 export default function Lab() {
-  if (new URLSearchParams(location.search).get('lab') === 'hero') return <HeroLab />;
+  const which = new URLSearchParams(location.search).get('lab');
+  if (which === 'hero' || which === 'mix') return <HeroLab mixes={which === 'mix'} />;
   return <KrakenLab />;
 }
 
