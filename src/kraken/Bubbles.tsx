@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { scrollStore } from '../scroll/store';
+import { PALETTE } from '../theme/palette';
 import { depthMix } from './depth';
 
 const M = new THREE.Matrix4();
@@ -13,7 +14,7 @@ const S = new THREE.Vector3();
 export function Bubbles({ count }: { count: number }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
   const geo = useMemo(() => new THREE.SphereGeometry(1, 10, 8), []);
-  const mat = useMemo(() => new THREE.MeshBasicMaterial({ color: '#ece7d9', transparent: true, opacity: 0, depthWrite: false }), []);
+  const mat = useMemo(() => new THREE.MeshBasicMaterial({ color: PALETTE.paper, transparent: true, opacity: 0, depthWrite: false }), []);
   const seeds = useMemo(
     () =>
       Array.from({ length: count }, (_, i) => {

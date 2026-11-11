@@ -227,3 +227,52 @@ body {
     animation: none;
   }
 }
+
+/* ---- more sea life ---- */
+@keyframes jelly {
+  from {
+    transform: translate3d(0, 18vh, 0);
+  }
+  to {
+    transform: translate3d(3vw, -26vh, 0);
+  }
+}
+.jelly {
+  animation: jelly 30s ease-in-out infinite alternate;
+}
+@keyframes jelly-pulse {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.9, 1.08);
+  }
+}
+.jelly-pulse {
+  transform-origin: 50% 20%;
+  animation: jelly-pulse 2.6s ease-in-out infinite;
+}
+@keyframes rise {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  to {
+    transform: translate3d(8px, -46vh, 0);
+    opacity: 0;
+  }
+}
+.rise {
+  animation: rise 5.2s ease-in infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .jelly,
+  .jelly-pulse,
+  .rise {
+    animation: none;
+  }
+}

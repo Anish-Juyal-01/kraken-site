@@ -1,6 +1,7 @@
 import { HERO, LINKS } from '../content/content';
 import type { HeroStage } from '../kraken/camera';
 import { Button } from '../ui/Button';
+import { Sky } from '../ui/SeaLife';
 
 export type HeroId = 'wordmark' | 'split' | 'poster' | 'voyage' | 'sunk' | 'mirror' | 'depths';
 
@@ -273,9 +274,12 @@ export function MirrorFront() {
 /* 7. Name in the depths: the team above, the name itself under the water. Everything centred. */
 export function DepthsBack() {
   return (
-    <p className="display absolute inset-x-0 text-center leading-none text-paper" style={{ top: '43vh', fontSize: '25.5vw', transform: 'translateY(-4%)', letterSpacing: '-0.045em' }}>
+    <>
+      <Sky horizon="40vh" />
+      <p className="display absolute inset-x-0 text-center leading-none text-paper" style={{ top: '43vh', fontSize: '25.5vw', transform: 'translateY(-4%)', letterSpacing: '-0.045em' }}>
       KRAKEN
-    </p>
+      </p>
+    </>
   );
 }
 export function DepthsFront() {

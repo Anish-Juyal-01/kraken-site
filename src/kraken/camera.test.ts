@@ -1,18 +1,18 @@
 import { expect, test } from 'vitest';
 import { cameraAt, krakenPlacement, waterTop } from './camera';
-import { depthColor, depthMix, inkColor } from './depth';
+import { DEEP, INK, PAPER, depthColor, depthMix, inkColor } from './depth';
 
 test('paper at the surface, deep from the dive to the end of the page, clamped outside', () => {
-  expect(depthColor(0)).toBe('#ece7d9');
-  expect(depthColor(1)).toBe('#0b2420'); // the page ends on the ocean bed
-  expect(depthColor(0.5)).toBe('#0b2420');
+  expect(depthColor(0)).toBe(PAPER);
+  expect(depthColor(1)).toBe(DEEP); // the page ends on the ocean bed
+  expect(depthColor(0.5)).toBe(DEEP);
   expect(depthColor(-1)).toBe(depthColor(0));
-  expect(depthColor(NaN)).toBe('#ece7d9');
+  expect(depthColor(NaN)).toBe(PAPER);
   expect(depthMix(0.3)).toBe(1);
 });
 test('ink flips with the background', () => {
-  expect(inkColor(0)).toBe('#12332d');
-  expect(inkColor(0.5)).toBe('#ece7d9');
+  expect(inkColor(0)).toBe(INK);
+  expect(inkColor(0.5)).toBe(PAPER);
 });
 test('camera and kraken are finite everywhere and the camera sinks', () => {
   for (const p of [-1, 0, 0.3, 0.72, 1, 2, NaN]) {

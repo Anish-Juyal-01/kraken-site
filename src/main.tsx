@@ -2,6 +2,9 @@ import { StrictMode, Suspense, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
+import { applyPalette } from './theme/palette';
+
+applyPalette(); // colours first, so nothing paints in the wrong ones
 
 // ?lab in the address shows the kraken designs side by side instead of the site.
 const Lab = lazy(() => import('./Lab'));

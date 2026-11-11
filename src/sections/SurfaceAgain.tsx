@@ -3,9 +3,9 @@ import { LINKS, RUN_STEPS } from '../content/content';
 import { Button } from '../ui/Button';
 import { Stage } from '../ui/Stage';
 
-const INK = '#0b2420';
-const HULL = '#ece7d9';
-const CORAL = '#e8553d';
+const INK = 'var(--color-deep)';
+const HULL = 'var(--color-paper)';
+const CORAL = 'var(--color-coral)';
 
 /** A small submarine parked on the ocean bed. Its big window is the demo video. */
 function Submarine({ children }: { children: React.ReactNode }) {
@@ -30,9 +30,9 @@ function Submarine({ children }: { children: React.ReactNode }) {
         <path d="M120 372 H648" stroke={CORAL} strokeWidth="10" strokeLinecap="round" />
         {/* small portholes */}
         <circle cx="112" cy="258" r="22" fill={INK} />
-        <circle cx="112" cy="258" r="13" fill="#1f5a4e" />
+        <circle cx="112" cy="258" r="13" fill="var(--pop)" />
         <circle cx="664" cy="258" r="22" fill={INK} />
-        <circle cx="664" cy="258" r="13" fill="#1f5a4e" />
+        <circle cx="664" cy="258" r="13" fill="var(--pop)" />
         {/* the big window frame: the video sits inside it */}
         <rect x="158" y="146" width="444" height="222" rx="30" fill={INK} />
         {[168, 592].flatMap((x) => [156, 358].map((y) => <circle key={`${x}-${y}`} cx={x} cy={y} r="3.5" fill={HULL} />))}
@@ -91,7 +91,7 @@ export function SurfaceAgain({ flow }: { flow: boolean }) {
         <div className="min-w-0">
           <h2 className="display text-2xl md:mt-3 md:text-3xl">Run it yourself</h2>
           <div className="relative mt-4 max-w-[560px]">
-            <pre className="whitespace-pre-wrap rounded-[var(--radius-card)] border border-[var(--line-now)] bg-[#0f332c] p-4 pr-20 font-mono text-[12.5px] leading-[1.75] text-paper [overflow-wrap:anywhere]">
+            <pre className="whitespace-pre-wrap rounded-[var(--radius-card)] border border-[var(--line-now)] bg-[var(--bed-2)] p-4 pr-20 font-mono text-[12.5px] leading-[1.75] text-paper [overflow-wrap:anywhere]">
               <code>{RUN_STEPS.join('\n')}</code>
             </pre>
             <button type="button" onClick={copy} className="absolute right-2.5 top-2.5 rounded-full bg-paper px-3 py-1 text-[12.5px] font-semibold text-deep active:scale-95">

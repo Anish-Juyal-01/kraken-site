@@ -1,13 +1,14 @@
-import { Suspense, lazy, useCallback, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { moodFor } from './kraken/moods';
 import { armAngle } from './kraken/armCurve';
 import { posesFor, ringFor } from './kraken/poses';
 import type { KrakenState } from './kraken/state';
-import { armIndexAt, armLocal } from './scroll/stages';
-import { useScrollProgress } from './scroll/useScrollProgress';
+import { armIndexAt, armLocal, progressOfArm } from './scroll/stages';
+import { scrollToProgress, useScrollProgress } from './scroll/useScrollProgress';
 import { useFlowProgress } from './scroll/useFlowProgress';
 import { detectDevice, qualityFor } from './kraken/quality';
-import { lookById } from './kraken/looks';
+import { lookById, tinted } from './kraken/looks';
+import { PALETTE } from './theme/palette';
 import { Ascent } from './sections/Ascent';
 import { Creature, CreatureList } from './sections/Creature';
 import { Descent } from './sections/Descent';
@@ -32,11 +33,16 @@ export default function App() {
   const [device, setDevice] = useState(detectDevice);
   const quality = useMemo(() => qualityFor(device), [device]);
   // ?look=mochi|dumbo|sticker|squid picks the kraken design
-  const look = useMemo(() => lookById(new URLSearchParams(location.search).get('look')), []);
+  const look = useMemo(() => tinted(lookById(new URLSearchParams(location.search).get('look')), PALETTE.kraken), []);
   // Reduced motion or no 3D: an ordinary page, no pinning, no scrubbing.
   const flow = quality.mode === 'still' || quality.mode === 'none';
   useScrollProgress(root, !flow);
   useFlowProgress(flow);
+  useEffect(() => {
+    if (location.hash !== '#deep') return;
+    const ids = [300, 1200, 2500].map((ms) => setTimeout(() => scrollToProgress(progressOfArm(4), true), ms));
+    return () => ids.forEach(clearTimeout);
+  }, []);
 
   /** Once per frame: turn scroll position and what the visitor did into the kraken's pose. */
   const direct = useCallback((s: KrakenState, p: number, now: number) => {

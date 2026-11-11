@@ -1,9 +1,11 @@
 // The page darkens once as you dive and lightens once as you rise.
 import { SECTION_RANGES, clamp01 } from '../scroll/stages';
 
-export const PAPER = '#ece7d9';
-export const DEEP = '#0b2420';
-export const INK = '#12332d';
+import { PALETTE } from '../theme/palette';
+
+export const PAPER = PALETTE.paper;
+export const DEEP = PALETTE.deep;
+export const INK = PALETTE.ink;
 
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const span = (p: number, a: number, b: number) => smooth(clamp01((p - a) / (b - a)));

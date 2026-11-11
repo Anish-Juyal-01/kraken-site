@@ -118,3 +118,8 @@ export const LOOKS: Look[] = [
 ];
 
 export const lookById = (id: string | null | undefined): Look => LOOKS.find((l) => l.id === id) ?? LOOKS[2]; // Sticker is the site's kraken
+
+/** The same look in a palette's colours. */
+export function tinted(look: Look, k: { skin: string; skinDeep: string; outline: string }): Look {
+  return { ...look, skin: k.skin, skinDeep: k.skinDeep, belly: look.bellyAmount > 0 ? look.belly : k.skin, outline: look.outline ? k.outline : null };
+}

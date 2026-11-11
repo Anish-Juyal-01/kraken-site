@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Kraken } from './kraken/Kraken';
 import { LOOKS, type Look } from './kraken/looks';
 import { HERO_DESIGNS } from './sections/heroDesigns';
+import { PALETTES } from './theme/palette';
 import type { MoodId } from './kraken/moods';
 import { posesFor, ringFor } from './kraken/poses';
 import { FULL } from './kraken/quality';
@@ -77,6 +78,35 @@ function HeroLab({ mixes }: { mixes: boolean }) {
   );
 }
 
+/** ?lab=palette: the same page in each palette. Top row is the first screen, tap a name for the full site. */
+function PaletteLab() {
+  return (
+    <main className="min-h-[100dvh] bg-[#e7e7e7] px-5 py-8 text-[#111] md:px-10">
+      <h1 className="display text-4xl">Palettes</h1>
+      <p className="mt-2 max-w-[70ch] text-[16px] leading-relaxed">Each pair shows the first screen and the deep in one palette. Click a name to open the whole site in it.</p>
+      <div className="mt-6 grid gap-x-6 gap-y-8 md:grid-cols-2">
+        {PALETTES.map((p) => (
+          <figure key={p.id}>
+            <div className="grid grid-cols-2 gap-2">
+              {['', '#deep'].map((hash) => (
+                <div key={hash} className="relative aspect-[16/9] overflow-hidden rounded-[var(--radius-card)] bg-white">
+                  <iframe title={`${p.name} ${hash}`} src={`./?palette=${p.id}${hash}`} className="absolute left-0 top-0 h-[900px] w-[1600px] origin-top-left border-0" style={{ transform: 'scale(var(--fit))' }} ref={fit} />
+                </div>
+              ))}
+            </div>
+            <figcaption className="mt-3">
+              <a className="display text-2xl underline decoration-[3px] underline-offset-4" style={{ textDecorationColor: p.accent }} href={`./?palette=${p.id}`} target="_blank" rel="noreferrer">
+                {p.name}
+              </a>
+              <p className="mt-1 max-w-[52ch] text-[14.5px] leading-relaxed opacity-85">{p.blurb}</p>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </main>
+  );
+}
+
 /** Scale a 1600x900 frame down to its box. */
 function fit(el: HTMLIFrameElement | null) {
   if (!el?.parentElement) return;
@@ -89,6 +119,7 @@ function fit(el: HTMLIFrameElement | null) {
 export default function Lab() {
   const which = new URLSearchParams(location.search).get('lab');
   if (which === 'hero' || which === 'mix') return <HeroLab mixes={which === 'mix'} />;
+  if (which === 'palette') return <PaletteLab />;
   return <KrakenLab />;
 }
 

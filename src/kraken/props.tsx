@@ -2,17 +2,18 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { PropKind } from '../content/content';
+import { PALETTE } from '../theme/palette';
 import type { KrakenState } from './state';
 import { COLORS, toonMaterial } from './toon';
 
-const BONE = '#ece7d9';
+const BONE = '#fffaf0';
 const WQ = new THREE.Quaternion();
 
 function useMats() {
   return useMemo(
     () => ({
       bone: toonMaterial(BONE),
-      ink: toonMaterial('#1d4a42'),
+      ink: toonMaterial(PALETTE.ink),
       coral: toonMaterial(COLORS.coralLight),
       dark: new THREE.MeshBasicMaterial({ color: COLORS.ink }),
     }),
