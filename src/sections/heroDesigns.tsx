@@ -42,12 +42,13 @@ const CHAT: Chat[] = [
   { where: '#api', text: '@kraken add GET /api/todos/{id}' },
 ];
 
-function ChatChip({ chat, className = '', tilt = 0 }: { chat: Chat; className?: string; tilt?: number }) {
+/** A chat message card. `scale` below 1 makes it smaller and paler, as if it floats further away. */
+function ChatChip({ chat, className = '', tilt = 0, scale = 1 }: { chat: Chat; className?: string; tilt?: number; scale?: number }) {
   return (
     <div className={`buoy absolute ${className}`}>
       <div
-        className="rounded-[var(--radius-card)] border border-[rgba(18,51,45,0.2)] bg-[#fbf9f3] px-4 py-3 text-left text-ink shadow-[0_10px_24px_-12px_rgba(11,36,32,0.55)]"
-        style={{ transform: `rotate(${tilt}deg)` }}
+        className="origin-bottom-left rounded-[var(--radius-card)] border border-[rgba(18,51,45,0.2)] bg-[#fbf9f3] px-4 py-3 text-left text-ink shadow-[0_10px_24px_-12px_rgba(11,36,32,0.55)]"
+        style={{ transform: `rotate(${tilt}deg) scale(${scale})`, opacity: scale < 1 ? 0.88 : 1 }}
       >
         <p className="text-[12.5px] font-semibold text-coral">{chat.where}</p>
         <p className="mt-0.5 whitespace-nowrap font-mono text-[13.5px]">{chat.text}</p>
@@ -290,10 +291,13 @@ export function DepthsFront() {
           {LINE1}
         </h1>
       </div>
-      {/* two cards floating on the water, between the island, the kraken and the boat */}
+      {/* four cards floating on the water in the two gaps between the island, the kraken and the
+          boat: in each gap one card is near, the other further back (higher, smaller, drawn first) */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[40vh] hidden md:block">
-        <ChatChip chat={CHAT[0]} className="left-[17%] -top-[40px] buoy-a" tilt={-3} />
-        <ChatChip chat={CHAT[3]} className="right-[11%] -top-[36px] buoy-b" tilt={3} />
+        <ChatChip chat={CHAT[1]} className="left-[22%] -top-[120px] buoy-b hidden lg:block" tilt={2} scale={0.78} />
+        <ChatChip chat={CHAT[2]} className="right-[13%] -top-[116px] buoy-c hidden lg:block" tilt={-2} scale={0.78} />
+        <ChatChip chat={CHAT[0]} className="left-[16%] -top-[40px] buoy-a" tilt={-3} scale={0.9} />
+        <ChatChip chat={CHAT[3]} className="right-[10%] -top-[36px] buoy-b" tilt={3} scale={0.9} />
       </div>
       {/* low on the screen, clear of the kraken; no buttons here, the menu and the last screen have the links */}
       <div className="absolute inset-x-0 bottom-[4.5vh] mx-auto flex max-w-[1400px] flex-col items-center px-12 text-center text-paper">
