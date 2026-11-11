@@ -39,7 +39,7 @@ const CHAT: Chat[] = [
   { where: '#kraken-requests', text: '@kraken build password reset' },
   { where: '#backend', text: '@kraken add rate limiting to /login' },
   { where: '#mobile', text: '@kraken validate POST /orders' },
-  { where: '#api', text: '@kraken add GET /api/todos/{id}' },
+  { where: '#api', text: '@kraken add GET /api/orders/{id}' },
 ];
 
 /** A chat message card. `scale` below 1 makes it smaller and paler, as if it floats further away. */

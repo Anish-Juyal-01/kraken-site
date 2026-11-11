@@ -1,5 +1,5 @@
-// All page copy and the recorded chat messages. Message text comes from real Kraken runs:
-// K-5 on fastapi-todo, the Gemini bid from K-10, the Sonar example from the bundled demo app.
+// All page copy and the chat messages. The messages follow one general example request (K-42
+// on a team's orders API), written in the same shape as real Kraken output.
 
 export type StageId = 'spark' | 'sonar' | 'charter' | 'forge' | 'storm' | 'deliver' | 'hallmark' | 'you';
 export type PropKind = 'pencil' | 'trumpet' | 'flag' | 'hammer' | 'umbrella' | 'letter' | 'book';
@@ -24,7 +24,7 @@ export const HERO = {
   sub: 'Kraken is a crew of AI agents that plans, builds, reviews and stress-tests your request, then waits for your thumbs-up.',
 };
 
-export const REQUEST = '@kraken build fastapi-todo: add a JSON endpoint GET /api/todos/{item_id}, or 404 when it does not exist';
+export const REQUEST = '@kraken build orders-api: add GET /api/orders/{id} that returns one order, or 404 when it does not exist';
 
 export const PROBLEM = [
   'Decisions get made in chat.',
@@ -40,7 +40,7 @@ export const ARMS: Arm[] = [
     line: 'A planner turns the request into a brief. Then Kraken asks who handles it.',
     messages: [
       { who: 'kraken-planner', text: "The request was clear, so I didn't need to ask anything. Brief written to the room document `brief`. BRIEF READY" },
-      { who: 'kraken', text: "[K-5] Brief ready. Who's handling this? Reply 🙋 to do it yourself, or 🤖 to give it to the agent. No answer in 2 min: the agent takes it." },
+      { who: 'kraken', text: "[K-42] Brief ready. Who's handling this? Reply 🙋 to do it yourself, or 🤖 to give it to the agent. No answer in 2 min: the agent takes it." },
     ],
   },
   {
@@ -49,7 +49,7 @@ export const ARMS: Arm[] = [
     prop: 'trumpet',
     line: 'Sonar listens to every room for decisions that contradict each other, or the code.',
     messages: [
-      { who: 'kraken', text: '#product says the free tier is 100 requests a day. config/limits.yaml says 1000. Which one is true?', note: 'Example from the bundled demo app, not from run K-5.' },
+      { who: 'kraken', text: '#product says the free tier is 100 requests a day. config/limits.yaml says 1000. Which one is true?' },
     ],
   },
   {
@@ -58,9 +58,9 @@ export const ARMS: Arm[] = [
     prop: 'flag',
     line: 'Every coding agent bids, naming the real files it will touch.',
     messages: [
-      { who: 'claude-coder', text: 'BID: about 10 minutes to a reviewable branch', files: 'main.py, requirements.txt, conftest.py, tests/test_api.py' },
-      { who: 'codex-coder', text: 'BID: about 10 minutes to a reviewable branch', files: 'main.py, tests/test_api.py, conftest.py, requirements.txt' },
-      { who: 'gemini-coder', text: 'BID: 8 to 10 minutes to a reviewable branch', files: 'demo/shopfront/api/main.py, tests/test_shopfront.py', note: 'From run K-10. Gemini joined the crew after K-5.' },
+      { who: 'claude-coder', text: 'BID: about 12 minutes to a reviewable branch', files: 'app/routes/orders.py, app/db.py, tests/test_orders.py' },
+      { who: 'codex-coder', text: 'BID: about 10 minutes to a reviewable branch', files: 'app/routes/orders.py, tests/test_orders.py' },
+      { who: 'gemini-coder', text: 'BID: 10 to 15 minutes to a reviewable branch', files: 'app/routes/orders.py, app/schemas.py, tests/test_orders.py' },
     ],
   },
   {
@@ -71,8 +71,8 @@ export const ARMS: Arm[] = [
     messages: [
       {
         who: 'codex-coder',
-        text: 'Hand-off for K-5: commit 3d1a53c on kraken/K-5',
-        code: '@app.get("/api/todos/{item_id}")\ndef api_get_todo(item_id: int, db: Session = Depends(get_db)):\n    todo = get_todo(db, item_id)\n    if todo is None:\n        raise HTTPException(status_code=404, detail="Todo not found")\n    return {"id": todo.id, "content": todo.content}',
+        text: 'Hand-off for K-42: commit 8c4e21b on kraken/K-42',
+        code: '@router.get("/api/orders/{order_id}")\ndef get_order(order_id: int, db: Session = Depends(get_db)):\n    order = db.get(Order, order_id)\n    if order is None:\n        raise HTTPException(status_code=404, detail="Order not found")\n    return OrderOut.model_validate(order)',
       },
       { who: 'claude-coder', text: "Checked against the brief's acceptance criteria and ran the tests. ACCEPTED" },
     ],
@@ -83,7 +83,7 @@ export const ARMS: Arm[] = [
     prop: 'umbrella',
     line: 'Chaos agents attack the running app. Try it: send the request that broke it.',
     messages: [
-      { who: 'squall', text: 'Fault 1, bad_payload, aimed at the new GET /api/todos/{item_id}: 64 malformed requests, no 5xx. Then a targeted follow-up.' },
+      { who: 'squall', text: 'Fault 1, bad_payload, aimed at the new GET /api/orders/{id}: 64 malformed requests, no 5xx. Then a targeted follow-up.' },
     ],
   },
   {
@@ -92,7 +92,7 @@ export const ARMS: Arm[] = [
     prop: 'letter',
     line: 'Nothing leaves the chat without a person. This step never has a timer.',
     messages: [
-      { who: 'kraken', text: '[K-5] Storm survived. Open a pull request? (No time limit: a person decides.)' },
+      { who: 'kraken', text: '[K-42] Storm survived. Open a pull request? (No time limit: a person decides.)' },
     ],
   },
   {
@@ -101,7 +101,7 @@ export const ARMS: Arm[] = [
     prop: 'book',
     line: 'Every decision is written down: who decided, and why.',
     messages: [
-      { who: 'hallmark', text: 'Judged winner: codex-coder. "It handles the import-time create_all trap correctly by redirecting the engine to a temp dir in conftest before main is imported. It also keeps the change smallest."' },
+      { who: 'hallmark', text: 'Judged winner: codex-coder. "Smallest change that meets every acceptance criterion, and the only bid with a test for the missing-order case." Decided by Kraken, no person replied in 2 min.' },
     ],
   },
   {
@@ -114,21 +114,21 @@ export const ARMS: Arm[] = [
 ];
 
 export const STORM = {
-  request: 'GET /api/todos/9223372036854775808',
+  request: 'GET /api/orders/9223372036854775808',
   button: 'Send the bad request',
   error: { code: '500', text: 'Internal Server Error', why: "One past the 64-bit limit. SQLite can't bind an integer that large." },
-  fix: { who: 'storm-defender', text: "Fixed in commit ff50ced: ids outside SQLite's signed 64-bit range now return 404, with regression tests." },
-  fixed: { code: '404', text: '{"detail": "Todo not found"}', why: 'Squall confirmed: 7 tests passed.' },
+  fix: { who: 'storm-defender', text: "Fixed in commit 1f9a7d0: ids outside SQLite's signed 64-bit range now return 404, with regression tests." },
+  fixed: { code: '404', text: '{"detail": "Order not found"}', why: 'Squall confirmed: 7 tests passed.' },
 };
 
 export const DELIVER = {
-  approved: '@codex-coder [K-5] approved. Push the branch kraken/K-5 and open a pull request against the base branch.',
+  approved: '@codex-coder [K-42] approved. Push the branch kraken/K-42 and open a pull request against the base branch.',
 };
 
 export const SPARK = {
-  yours: "[K-5] You are handling Spark: no time limit. Reply 🤖 any time to give it to the agent.",
-  agent: '[K-5] Spark: handed to the agent by Kraken (no reply from a person in 2 min).',
-  agentChosen: '[K-5] Spark: handed to the agent by you.',
+  yours: "[K-42] You are handling Spark: no time limit. Reply 🤖 any time to give it to the agent.",
+  agent: '[K-42] Spark: handed to the agent by Kraken (no reply from a person in 2 min).',
+  agentChosen: '[K-42] Spark: handed to the agent by you.',
 };
 
 export const SWITCH_ROWS: { feature: string; use: string }[] = [
