@@ -59,7 +59,7 @@ export const ARMS: Arm[] = [
     line: 'Every coding agent bids, naming the real files it will touch.',
     messages: [
       { who: 'claude-coder', text: 'BID: about 10 minutes to a reviewable branch', files: 'main.py, requirements.txt, conftest.py, tests/test_api.py' },
-      { who: 'claude-coder-2', text: 'BID: about 10 minutes to a reviewable branch', files: 'main.py, tests/test_api.py, conftest.py, requirements.txt' },
+      { who: 'codex-coder', text: 'BID: about 10 minutes to a reviewable branch', files: 'main.py, tests/test_api.py, conftest.py, requirements.txt' },
       { who: 'gemini-coder', text: 'BID: 8 to 10 minutes to a reviewable branch', files: 'demo/shopfront/api/main.py, tests/test_shopfront.py', note: 'From run K-10. Gemini joined the crew after K-5.' },
     ],
   },
@@ -70,7 +70,7 @@ export const ARMS: Arm[] = [
     line: 'The winner builds on its own branch. The other bidders review it against the brief.',
     messages: [
       {
-        who: 'claude-coder-2',
+        who: 'codex-coder',
         text: 'Hand-off for K-5: commit 3d1a53c on kraken/K-5',
         code: '@app.get("/api/todos/{item_id}")\ndef api_get_todo(item_id: int, db: Session = Depends(get_db)):\n    todo = get_todo(db, item_id)\n    if todo is None:\n        raise HTTPException(status_code=404, detail="Todo not found")\n    return {"id": todo.id, "content": todo.content}',
       },
@@ -101,7 +101,7 @@ export const ARMS: Arm[] = [
     prop: 'book',
     line: 'Every decision is written down: who decided, and why.',
     messages: [
-      { who: 'hallmark', text: 'Judged winner: claude-coder-2. "It handles the import-time create_all trap correctly by redirecting the engine to a temp dir in conftest before main is imported. It also keeps the change smallest."' },
+      { who: 'hallmark', text: 'Judged winner: codex-coder. "It handles the import-time create_all trap correctly by redirecting the engine to a temp dir in conftest before main is imported. It also keeps the change smallest."' },
     ],
   },
   {
@@ -122,7 +122,7 @@ export const STORM = {
 };
 
 export const DELIVER = {
-  approved: '@claude-coder-2 [K-5] approved. Push the branch kraken/K-5 and open a pull request against the base branch.',
+  approved: '@codex-coder [K-5] approved. Push the branch kraken/K-5 and open a pull request against the base branch.',
 };
 
 export const SPARK = {
