@@ -27,6 +27,7 @@ export function Eyes({ look, mood, gazeAt, animate, z }: Props) {
   const blink = useRef({ next: 2.5, t: -1 });
   const r = e.r;
   const flat = e.style === 'dot' || e.style === 'button'; // no white eyeball
+  const rimW = look.outlineWidth > 0.03 ? 0.03 : 0.016;
 
   useFrame(({ clock }, dt) => {
     const now = clock.elapsedTime;
@@ -45,7 +46,8 @@ export function Eyes({ look, mood, gazeAt, animate, z }: Props) {
     const lid = Math.min(1, m.lid + blinkAmt);
     const [lx, ly] = gazeAt();
     for (let i = 0; i < 2; i++) {
-      const travel = flat ? r * 0.35 : r * 0.36;
+      // big pupils get less room to move, so they never slide off the eyeball
+      const travel = e.style === 'sticker' ? r * 0.2 : flat ? r * 0.35 : r * 0.34;
       gaze.current[i]?.position.set(lx * travel, ly * travel * 0.9, 0);
       irises.current[i]?.scale.set(r * 0.6 * (0.85 + m.pupil * 0.15), r * 0.66 * (0.85 + m.pupil * 0.15), 0.04);
       const ps = e.style === 'sticker' ? 0.62 : 0.37;
@@ -61,7 +63,8 @@ export function Eyes({ look, mood, gazeAt, animate, z }: Props) {
     <group>
       {[-1, 1].map((side, i) => (
         <group key={side} ref={(g) => (eyes.current[i] = g)} position={[side * e.x, e.y, z]}>
-          {!flat && <mesh geometry={ball} material={rim} scale={r + (look.outlineWidth > 0.03 ? 0.035 : 0.018)} position={[0, 0, -0.04]} />}
+          {/* the rim sits well behind the eyeball, so it only shows as a ring round the edge */}
+          {!flat && <mesh geometry={ball} material={rim} scale={r + rimW} position={[0, 0, -rimW * 3]} />}
           {!flat && <mesh geometry={ball} material={white} scale={r} />}
           <group ref={(g) => (gaze.current[i] = g)}>
             {e.style === 'iris' && <mesh ref={(m) => (irises.current[i] = m)} geometry={ball} material={iris} position={[0, 0, r - 0.03]} />}

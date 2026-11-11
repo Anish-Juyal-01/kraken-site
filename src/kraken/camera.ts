@@ -19,6 +19,16 @@ const PEEK_SCALE_TALL = 0.62;
 export const isTall = (aspect: number) => Number.isFinite(aspect) && aspect > 0 && aspect < 0.9;
 export type Placement = { x: number; y: number; z: number; scale: number };
 
+/** How the first screen is staged: where the waterline rests, and where the kraken waits.
+ *  The first-screen design sets this once; the defaults are the centred design. */
+export type HeroStage = { water: number; x: number; dy: number; scale: number };
+const hero: HeroStage = { water: 68, x: 0, dy: 0, scale: 1 };
+export function setHeroStage(next: Partial<HeroStage>) {
+  Object.assign(hero, next);
+}
+/** World height of a waterline that sits `vh` percent down the screen (camera at rest). */
+const waterWorldY = (vh: number) => 0.5 + 2.44 * (1 - (2 * vh) / 100);
+
 /** `aspect` = viewport width / height: on narrow screens the kraken stays nearer the middle. */
 export function krakenPlacement(p: number, aspect: number): Placement {
   const c = clamp01(p);
@@ -34,7 +44,11 @@ export function krakenPlacement(p: number, aspect: number): Placement {
   const peekY = tall ? PEEK_Y_TALL : PEEK_Y;
   const peekScale = tall ? PEEK_SCALE_TALL : 1;
   if (c < R.descent[0] + 0.03) {
-    return { x: 0, y: mix(peekY, -4.5, duck), z: 0, scale: peekScale }; // centre stage on the first screen
+    if (tall) return { x: 0, y: mix(peekY, -4.5, duck), z: 0, scale: peekScale };
+    // the first-screen design decides where the kraken waits (default: centre, eyes above water)
+    const heroY = waterWorldY(hero.water) - 0.54 + hero.dy;
+    const heroX = Math.max(-2.44 * a * 0.62, Math.min(2.44 * a * 0.62, hero.x));
+    return { x: heroX, y: mix(heroY, -4.5, duck), z: 0, scale: hero.scale };
   }
   const midY = tall ? 1.25 : 0;
   const midScale = tall ? 0.6 : 1;
@@ -50,8 +64,10 @@ export function krakenPlacement(p: number, aspect: number): Placement {
 /** Top edge of the water, in vh from the top of the screen. */
 export function waterTop(p: number, aspect = 1.6): number {
   const c = clamp01(p);
-  const rest = isTall(aspect) ? 78 : 68;
+  const tall = isTall(aspect);
   const down = span(c, R.surface[1] - 0.03, R.waterline[1] - 0.02);
   const up = span(c, R.ascent[0] + 0.01, R.surfaceAgain[0] + 0.03);
-  return mix(rest, -25, clamp01(down - up));
+  // the first screen may rest the waterline elsewhere; the last screen always uses 68 (78 on phones)
+  if (c < 0.5) return mix(tall ? 78 : hero.water, -25, down);
+  return mix(-25, tall ? 78 : 68, up);
 }

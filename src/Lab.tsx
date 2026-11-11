@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Kraken } from './kraken/Kraken';
 import { LOOKS, type Look } from './kraken/looks';
+import { HERO_DESIGNS } from './sections/heroDesigns';
 import type { MoodId } from './kraken/moods';
 import { posesFor, ringFor } from './kraken/poses';
 import { FULL } from './kraken/quality';
@@ -49,8 +50,46 @@ function Tile({ look, mood, reach, deep }: { look: Look; mood: MoodId; reach: bo
   );
 }
 
+/** ?lab=hero: the four first-screen designs, each one the real page in a small frame. */
+function HeroLab() {
+  return (
+    <main className="min-h-[100dvh] bg-[#d9d3c4] px-5 py-8 text-ink md:px-10">
+      <h1 className="display text-4xl">Four first screens</h1>
+      <p className="mt-2 max-w-[70ch] text-[16px] leading-relaxed">Each frame is the real page. Click a name to open that design full size.</p>
+      <div className="mt-6 grid gap-6 md:grid-cols-2">
+        {HERO_DESIGNS.map((h) => (
+          <figure key={h.id}>
+            <div className="relative aspect-[16/9] overflow-hidden rounded-[var(--radius-card)] bg-paper">
+              <iframe title={h.name} src={`./?hero=${h.id}`} className="absolute left-0 top-0 h-[900px] w-[1600px] origin-top-left border-0" style={{ transform: 'scale(var(--fit))' }} ref={fit} />
+            </div>
+            <figcaption className="mt-3">
+              <a className="display text-2xl underline decoration-coral decoration-[3px] underline-offset-4" href={`./?hero=${h.id}`} target="_blank" rel="noreferrer">
+                {h.name}
+              </a>
+              <p className="mt-1 max-w-[52ch] text-[14.5px] leading-relaxed opacity-85">{h.blurb}</p>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </main>
+  );
+}
+
+/** Scale a 1600x900 frame down to its box. */
+function fit(el: HTMLIFrameElement | null) {
+  if (!el?.parentElement) return;
+  const set = () => el.style.setProperty('--fit', String(el.parentElement!.clientWidth / 1600));
+  set();
+  new ResizeObserver(set).observe(el.parentElement);
+}
+
 /** Four kraken designs side by side, so one can be picked. Open with ?lab in the address. */
 export default function Lab() {
+  if (new URLSearchParams(location.search).get('lab') === 'hero') return <HeroLab />;
+  return <KrakenLab />;
+}
+
+function KrakenLab() {
   const [mood, setMood] = useState<MoodId>('neutral');
   const [reach, setReach] = useState(false);
   const [deep, setDeep] = useState(false);

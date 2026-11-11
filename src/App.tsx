@@ -12,7 +12,8 @@ import { Ascent } from './sections/Ascent';
 import { Creature, CreatureList } from './sections/Creature';
 import { Descent } from './sections/Descent';
 import { Floor } from './sections/Floor';
-import { Surface } from './sections/Surface';
+import { Surface, SurfaceBack } from './sections/Surface';
+import { Backdrop } from './ui/Backdrop';
 import { SurfaceAgain } from './sections/SurfaceAgain';
 import { Waterline } from './sections/Waterline';
 import { interactions } from './sections/interactions';
@@ -67,6 +68,11 @@ export default function App() {
     <div ref={root} className="relative">
       <Ambience />
       <WaterBack />
+      {!flow && (
+        <Backdrop>
+          <SurfaceBack />
+        </Backdrop>
+      )}
       {quality.mode !== 'none' && (
         <Suspense fallback={null}>
           <Scene quality={quality} look={look} direct={direct} onLost={() => setDevice((d) => ({ ...d, webgl: false }))} />
