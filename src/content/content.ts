@@ -20,8 +20,8 @@ export const LINKS = {
 };
 
 export const HERO = {
-  headline: 'Your team decides in chat. Something below is listening.',
-  sub: 'Kraken is a crew of AI agents in your team chat that turns a request into a tested pull request.',
+  headline: 'Ask for it in chat. Eight arms get to work.',
+  sub: 'Kraken is a crew of AI agents that plans, builds, reviews and stress-tests your request, then waits for your thumbs-up.',
 };
 
 export const REQUEST = '@kraken build fastapi-todo: add a JSON endpoint GET /api/todos/{item_id}, or 404 when it does not exist';

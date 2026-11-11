@@ -11,11 +11,13 @@ export const HERO_DESIGNS: { id: HeroId; name: string; blurb: string; stage: Her
   // mixes of Wordmark and Above-and-below
   { id: 'sunk', mix: true, name: 'Sunk wordmark', blurb: 'The waterline splits the screen and the giant KRAKEN straddles it: two thirds in the air, one third under. The second sentence waits below.', stage: { water: 50, x: 2.05, dy: 0, scale: 1 } },
   { id: 'mirror', mix: true, name: 'Mirror', blurb: 'KRAKEN stands on the water and its reflection hangs below, where the second sentence and the kraken are.', stage: { water: 52, x: 0.1, dy: -0.02, scale: 0.95 } },
-  { id: 'depths', mix: true, name: 'Name in the depths', blurb: 'Above: the team and its chat. Below: the name itself, huge and pale under the water, with the kraken in front of it.', stage: { water: 42, x: 1.9, dy: -1.3, scale: 1.05 } },
+  { id: 'depths', mix: true, name: 'Name in the depths', blurb: 'Above: the team and its chat. Below: the name itself, huge and pale under the water, with the kraken in front of it.', stage: { water: 40, x: 0, dy: -0.66, scale: 0.82 } },
   { id: 'voyage', name: 'Voyage', blurb: 'A small scene: a low sun, a boat carrying the team chat, and the kraken rising under it.', stage: { water: 55, x: 1.2, dy: -0.05, scale: 1.05 } },
 ];
 
-export const heroById = (id: string | null | undefined) => HERO_DESIGNS.find((h) => h.id === id) ?? HERO_DESIGNS[0];
+// 'depths' (Name in the depths) is the site's first screen; the others stay available by ?hero=
+export const heroById = (id: string | null | undefined) =>
+  HERO_DESIGNS.find((h) => h.id === id) ?? HERO_DESIGNS.find((h) => h.id === 'depths')!;
 
 const [LINE1, LINE2] = HERO.headline.split('. ').map((part, i, all) => (i < all.length - 1 ? `${part}.` : part));
 
@@ -31,11 +33,12 @@ function Cta({ className = '' }: { className?: string }) {
 }
 
 type Chat = { where: string; text: string };
+// What people actually type to Kraken (examples from its README and demo runs).
 const CHAT: Chat[] = [
-  { where: '#backend', text: 'user_id is a UUID string' },
-  { where: '#mobile', text: 'we parse user_id as an int' },
-  { where: '#product', text: 'free tier: 100 requests a day' },
-  { where: 'limits.yaml', text: 'requests_per_day: 1000' },
+  { where: '#kraken-requests', text: '@kraken build password reset' },
+  { where: '#backend', text: '@kraken add rate limiting to /login' },
+  { where: '#mobile', text: '@kraken validate POST /orders' },
+  { where: '#api', text: '@kraken add GET /api/todos/{id}' },
 ];
 
 function ChatChip({ chat, className = '', tilt = 0 }: { chat: Chat; className?: string; tilt?: number }) {
@@ -267,10 +270,10 @@ export function MirrorFront() {
   );
 }
 
-/* 7. Name in the depths: the team above, the name itself under the water */
+/* 7. Name in the depths: the team above, the name itself under the water. Everything centred. */
 export function DepthsBack() {
   return (
-    <p className="display absolute inset-x-0 text-center leading-none text-paper" style={{ top: '45vh', fontSize: '25.5vw', transform: 'translateY(-4%)', letterSpacing: '-0.045em' }}>
+    <p className="display absolute inset-x-0 text-center leading-none text-paper" style={{ top: '43vh', fontSize: '25.5vw', transform: 'translateY(-4%)', letterSpacing: '-0.045em' }}>
       KRAKEN
     </p>
   );
@@ -278,17 +281,29 @@ export function DepthsBack() {
 export function DepthsFront() {
   return (
     <>
-      <div className="mx-auto max-w-[1400px] px-12 pt-[3vh]">
-        <h1 className="display max-w-[14ch]" style={{ fontSize: 'clamp(38px, min(8.6vh, 5.8vw), 96px)' }}>
+      <div className="mx-auto max-w-[1400px] px-12 pt-[2.5vh] text-center">
+        <h1 className="display" style={{ fontSize: 'clamp(40px, min(9.4vh, 6.2vw), 104px)' }}>
           {LINE1}
         </h1>
       </div>
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[42vh] hidden md:block">
-        <ChatChip chat={CHAT[0]} className="right-[31%] -top-[62px] buoy-a" tilt={-3} />
-        <ChatChip chat={CHAT[1]} className="right-[9%] -top-[70px] buoy-b" tilt={4} />
-        <ChatChip chat={CHAT[3]} className="right-[20%] -top-[148px] buoy-c hidden xl:block" tilt={-2} />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[40vh] hidden md:block">
+        <ChatChip chat={CHAT[0]} className="left-[5%] -top-[64px] buoy-a" tilt={-3} />
+        <ChatChip chat={CHAT[1]} className="left-[23%] -top-[58px] buoy-b hidden xl:block" tilt={3} />
+        <ChatChip chat={CHAT[2]} className="right-[21%] -top-[60px] buoy-c hidden xl:block" tilt={-2} />
+        <ChatChip chat={CHAT[3]} className="right-[4%] -top-[66px] buoy-b" tilt={4} />
       </div>
-      <Below top="68vh" big={false} />
+      <div className="absolute inset-x-0 top-[76vh] mx-auto flex max-w-[1400px] flex-col items-center px-12 text-center text-paper">
+        <p className="display" style={{ fontSize: 'clamp(30px, min(5.6vh, 3.8vw), 60px)' }}>
+          {LINE2}
+        </p>
+        <p className="mt-[1.2vh] max-w-[70ch] text-[17px] leading-relaxed">{HERO.sub}</p>
+        <div className="mt-[1.8vh] flex flex-wrap justify-center gap-3">
+          <Button href={LINKS.demo}>Watch the demo</Button>
+          <a className={GHOST} href={LINKS.repo} target="_blank" rel="noreferrer">
+            View on GitHub
+          </a>
+        </div>
+      </div>
     </>
   );
 }
