@@ -109,7 +109,9 @@ function Island({ horizon }: { horizon: string }) {
 
 function Boat({ horizon }: { horizon: string }) {
   return (
-    <div className="buoy buoy-c absolute right-[7%]" style={{ top: horizon, transform: 'translateY(-91%)' }}>
+    // the outer box sits the hull on the horizon; the inner one bobs (its animation owns `transform`)
+    <div className="absolute right-[2%]" style={{ top: horizon, transform: 'translateY(-93%)' }}>
+      <div className="buoy buoy-c">
       <svg className="w-[8.5vw] min-w-[96px]" viewBox="0 0 220 200" fill="none" aria-hidden>
         <path d="M108 14 V152" stroke="var(--color-ink)" strokeWidth="4" strokeLinecap="round" />
         <path d="M108 14 L130 21 L108 28 Z" fill="var(--pop)" />
@@ -124,6 +126,7 @@ function Boat({ horizon }: { horizon: string }) {
         <path d="M22 152 H198 C 191 174, 173 186, 150 186 H70 C 47 186, 29 174, 22 152 Z" fill="var(--color-ink)" />
         <path d="M34 163 H186" stroke="var(--color-paper)" strokeWidth="4" strokeLinecap="round" />
       </svg>
+      </div>
     </div>
   );
 }

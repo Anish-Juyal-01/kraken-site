@@ -290,12 +290,10 @@ export function DepthsFront() {
           {LINE1}
         </h1>
       </div>
-      {/* the chips float in the sky, clear of the island and the boat on the horizon */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block">
-        <ChatChip chat={CHAT[0]} className="left-[15%] top-[28vh] buoy-a" tilt={-3} />
-        <ChatChip chat={CHAT[1]} className="left-[27%] top-[20.5vh] buoy-b hidden xl:block" tilt={3} />
-        <ChatChip chat={CHAT[2]} className="right-[27%] top-[21vh] buoy-c hidden xl:block" tilt={-2} />
-        <ChatChip chat={CHAT[3]} className="right-[15%] top-[29vh] buoy-b" tilt={4} />
+      {/* two cards floating on the water, between the island, the kraken and the boat */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-[40vh] hidden md:block">
+        <ChatChip chat={CHAT[0]} className="left-[17%] -top-[40px] buoy-a" tilt={-3} />
+        <ChatChip chat={CHAT[3]} className="right-[11%] -top-[36px] buoy-b" tilt={3} />
       </div>
       {/* low on the screen, clear of the kraken; no buttons here, the menu and the last screen have the links */}
       <div className="absolute inset-x-0 bottom-[4.5vh] mx-auto flex max-w-[1400px] flex-col items-center px-12 text-center text-paper">
