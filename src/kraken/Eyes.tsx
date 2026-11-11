@@ -1,32 +1,32 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import type { Look } from './looks';
 import type { Mood } from './moods';
-import { COLORS, toonMaterial } from './toon';
+import { COLORS, lookMaterial } from './toon';
 
-const EYE_R = 0.275;
-const EYES: [number, number, number][] = [
-  [-0.37, 0.36, 0.8],
-  [0.37, 0.36, 0.8],
-];
+type Props = { look: Look; mood: React.MutableRefObject<Mood>; gazeAt: () => [number, number]; animate: boolean; z: number };
 
-type Props = { mood: React.MutableRefObject<Mood>; look: () => [number, number]; animate: boolean };
-
-/** Two big eyes: iris and pupil follow `look`, lids close with the mood and blink on their own. */
-export function Eyes({ mood, look, animate }: Props) {
-  const white = useMemo(() => toonMaterial(COLORS.white), []);
-  const rim = useMemo(() => new THREE.MeshBasicMaterial({ color: COLORS.outline }), []);
-  const iris = useMemo(() => new THREE.MeshBasicMaterial({ color: COLORS.iris }), []);
-  const pupil = useMemo(() => new THREE.MeshBasicMaterial({ color: '#06120f' }), []);
+/** Two eyes in the look's style. The gaze follows `gazeAt`; lids (where the look has them) close
+ *  with the mood and blink. Looks without lids blink by squashing the eye flat. */
+export function Eyes({ look, mood, gazeAt, animate, z }: Props) {
+  const e = look.eyes;
+  const white = useMemo(() => lookMaterial(look, COLORS.white), [look]);
+  const rim = useMemo(() => new THREE.MeshBasicMaterial({ color: look.outline ?? look.skinDeep }), [look]);
+  const iris = useMemo(() => new THREE.MeshBasicMaterial({ color: e.iris }), [e.iris]);
+  const pupil = useMemo(() => new THREE.MeshBasicMaterial({ color: '#0a0f0e' }), []);
   const shine = useMemo(() => new THREE.MeshBasicMaterial({ color: '#ffffff' }), []);
-  const lidMat = useMemo(() => toonMaterial(COLORS.coralDeep), []);
+  const lidMat = useMemo(() => lookMaterial(look, look.skinDeep), [look]);
   const ball = useMemo(() => new THREE.SphereGeometry(1, 32, 24), []);
   const lidGeo = useMemo(() => new THREE.SphereGeometry(1, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), []);
+  const eyes = useRef<(THREE.Group | null)[]>([]);
   const gaze = useRef<(THREE.Group | null)[]>([]);
   const irises = useRef<(THREE.Mesh | null)[]>([]);
   const pupils = useRef<(THREE.Mesh | null)[]>([]);
   const lids = useRef<(THREE.Mesh | null)[]>([]);
   const blink = useRef({ next: 2.5, t: -1 });
+  const r = e.r;
+  const flat = e.style === 'dot' || e.style === 'button'; // no white eyeball
 
   useFrame(({ clock }, dt) => {
     const now = clock.elapsedTime;
@@ -43,31 +43,44 @@ export function Eyes({ mood, look, animate }: Props) {
     }
     const m = mood.current;
     const lid = Math.min(1, m.lid + blinkAmt);
-    const [lx, ly] = look();
+    const [lx, ly] = gazeAt();
     for (let i = 0; i < 2; i++) {
-      gaze.current[i]?.position.set(lx * 0.095, ly * 0.085, 0);
-      // scale the iris and pupil in place; scaling the group would pull them inside the eyeball
-      irises.current[i]?.scale.set(0.165 * (0.85 + m.pupil * 0.15), 0.18 * (0.85 + m.pupil * 0.15), 0.04);
-      pupils.current[i]?.scale.set(0.1 * m.pupil, 0.112 * m.pupil, 0.04);
+      const travel = flat ? r * 0.35 : r * 0.36;
+      gaze.current[i]?.position.set(lx * travel, ly * travel * 0.9, 0);
+      irises.current[i]?.scale.set(r * 0.6 * (0.85 + m.pupil * 0.15), r * 0.66 * (0.85 + m.pupil * 0.15), 0.04);
+      const ps = e.style === 'sticker' ? 0.62 : 0.37;
+      pupils.current[i]?.scale.set(r * ps * (0.6 + m.pupil * 0.4), r * ps * 1.12 * (0.6 + m.pupil * 0.4), 0.04);
       const l = lids.current[i];
-      // The lid is the top half of a sphere, tipped back out of sight when open.
-      if (l) l.rotation.x = -1.8 + lid * 1.9;
+      if (l) l.rotation.x = -1.8 + lid * 1.9; // the lid is a half sphere, tipped back when open
+      // lidless eyes close by squashing
+      if (!e.lids) eyes.current[i]?.scale.set(1, Math.max(0.12, 1 - lid * 0.9) * (0.8 + m.pupil * 0.2), 1);
     }
   });
 
   return (
     <group>
-      {EYES.map((pos, i) => (
-        <group key={i} position={pos}>
-          <mesh geometry={ball} material={rim} scale={EYE_R + 0.018} position={[0, 0, -0.04]} />
-          <mesh geometry={ball} material={white} scale={EYE_R} />
+      {[-1, 1].map((side, i) => (
+        <group key={side} ref={(g) => (eyes.current[i] = g)} position={[side * e.x, e.y, z]}>
+          {!flat && <mesh geometry={ball} material={rim} scale={r + (look.outlineWidth > 0.03 ? 0.035 : 0.018)} position={[0, 0, -0.04]} />}
+          {!flat && <mesh geometry={ball} material={white} scale={r} />}
           <group ref={(g) => (gaze.current[i] = g)}>
-            <mesh ref={(m) => (irises.current[i] = m)} geometry={ball} material={iris} position={[0, 0, EYE_R - 0.03]} />
-            <mesh ref={(m) => (pupils.current[i] = m)} geometry={ball} material={pupil} position={[0, 0, EYE_R - 0.012]} />
-            <mesh geometry={ball} material={shine} scale={[0.05, 0.055, 0.02]} position={[0.055, 0.07, EYE_R + 0.03]} />
-            <mesh geometry={ball} material={shine} scale={[0.022, 0.024, 0.02]} position={[-0.05, -0.05, EYE_R + 0.03]} />
+            {e.style === 'iris' && <mesh ref={(m) => (irises.current[i] = m)} geometry={ball} material={iris} position={[0, 0, r - 0.03]} />}
+            {(e.style === 'iris' || e.style === 'sticker') && (
+              <mesh ref={(m) => (pupils.current[i] = m)} geometry={ball} material={pupil} position={[0, 0, r - 0.012]} />
+            )}
+            {e.style === 'dot' && <mesh geometry={ball} material={iris} scale={[r, r * 1.18, r * 0.5]} />}
+            {e.style === 'button' && <mesh geometry={ball} material={iris} scale={r} />}
+            <mesh
+              geometry={ball}
+              material={shine}
+              scale={[r * 0.2, r * 0.22, 0.02]}
+              position={[r * 0.22, r * 0.28, flat ? r * 0.52 : r + 0.03]}
+            />
+            {e.style !== 'dot' && (
+              <mesh geometry={ball} material={shine} scale={[r * 0.09, r * 0.1, 0.02]} position={[-r * 0.2, -r * 0.2, flat ? r * 0.98 : r + 0.03]} />
+            )}
           </group>
-          <mesh ref={(m) => (lids.current[i] = m)} geometry={lidGeo} material={lidMat} scale={EYE_R + 0.03} />
+          {e.lids && <mesh ref={(m) => (lids.current[i] = m)} geometry={lidGeo} material={lidMat} scale={r + 0.03} />}
         </group>
       ))}
     </group>

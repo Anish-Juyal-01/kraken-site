@@ -16,7 +16,7 @@ export function ChatCard({ msg, children }: { msg: ChatMsg; children?: React.Rea
       </div>
       <p className="mt-2.5 font-mono text-[13.5px] leading-relaxed">{msg.text}</p>
       {msg.code && (
-        <pre className="mt-3 overflow-x-auto rounded-[10px] bg-deep p-3 font-mono text-[12px] leading-relaxed text-paper">
+        <pre className="mt-3 whitespace-pre-wrap rounded-[10px] bg-deep p-3 font-mono text-[11.5px] leading-relaxed text-paper [overflow-wrap:anywhere]">
           <code>{msg.code}</code>
         </pre>
       )}

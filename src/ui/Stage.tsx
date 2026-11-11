@@ -47,7 +47,7 @@ export function Stage({ id, children, className = '', fadeIn = true, fadeOut = t
     <section id={id} data-section={id} className="relative z-[2]" style={{ height: sectionHeight(id) }}>
       {/* Fixed, not sticky: a section shorter than the screen could never pin. The section's
           height only supplies scroll distance; visibility comes from scroll progress. */}
-      <div ref={inner} className={`fixed inset-0 overflow-hidden ${className}`} style={{ visibility: 'hidden' }}>
+      <div ref={inner} className={`fixed inset-0 ${className}`} style={{ visibility: 'hidden' }}>
         {children}
       </div>
     </section>

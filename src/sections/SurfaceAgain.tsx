@@ -43,7 +43,7 @@ export function SurfaceAgain({ flow }: { flow: boolean }) {
         <div className="min-w-0">
           <h2 className="display text-2xl md:mt-3 md:text-3xl">Run it yourself</h2>
           <div className="relative mt-4 max-w-[560px]">
-            <pre className="overflow-x-auto rounded-[var(--radius-card)] bg-deep p-4 pr-20 font-mono text-[12.5px] leading-[1.75] text-paper">
+            <pre className="whitespace-pre-wrap rounded-[var(--radius-card)] bg-deep p-4 pr-20 font-mono text-[12.5px] leading-[1.75] text-paper [overflow-wrap:anywhere]">
               <code>{RUN_STEPS.join('\n')}</code>
             </pre>
             <button type="button" onClick={copy} className="absolute right-2.5 top-2.5 rounded-full bg-paper px-3 py-1 text-[12.5px] font-semibold text-deep active:scale-95">

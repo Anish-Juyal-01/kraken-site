@@ -7,11 +7,12 @@ import { Bubbles } from './Bubbles';
 import { cameraAt, krakenPlacement } from './camera';
 import { depthColor } from './depth';
 import { Kraken } from './Kraken';
+import { lookById, type Look } from './looks';
 import { Prop } from './props';
 import { FULL, type Quality } from './quality';
 import { initialState, type KrakenState } from './state';
 
-type Props = { quality?: Quality; direct?: (state: KrakenState, p: number, now: number) => void; onLost?: () => void };
+type Props = { quality?: Quality; look?: Look; direct?: (state: KrakenState, p: number, now: number) => void; onLost?: () => void };
 
 const fogColor = new THREE.Color();
 
@@ -36,7 +37,7 @@ function Director({ state, direct }: { state: KrakenState; direct?: Props['direc
 }
 
 /** The fixed 3D layer behind the page. */
-export default function Scene({ quality = FULL, direct, onLost }: Props) {
+export default function Scene({ quality = FULL, look = lookById(null), direct, onLost }: Props) {
   const state = useMemo(() => initialState(), []);
   if (import.meta.env.DEV) (window as unknown as { __k: KrakenState }).__k = state;
 
@@ -69,6 +70,7 @@ export default function Scene({ quality = FULL, direct, onLost }: Props) {
       <directionalLight position={[-3.5, 5, 6]} intensity={2.0} />
       <Director state={state} direct={direct} />
       <Kraken
+        look={look}
         state={state}
         quality={quality}
         renderProp={(i) => {

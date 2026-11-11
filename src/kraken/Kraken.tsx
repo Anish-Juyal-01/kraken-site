@@ -6,25 +6,28 @@ import { Body } from './Body';
 import { MOODS, blendMood, type Mood } from './moods';
 import type { KrakenState } from './state';
 import type { Quality } from './quality';
-import { COLORS, toonMaterial } from './toon';
+import type { Look } from './looks';
+import { lookMaterial } from './toon';
 
-type Props = { state: KrakenState; quality: Quality; renderProp?: (index: number) => React.ReactNode };
+type Props = { look: Look; state: KrakenState; quality: Quality; renderProp?: (index: number) => React.ReactNode };
 
 /** The whole creature. Reads `state` every frame; never re-renders after mount. */
-export function Kraken({ state, quality, renderProp }: Props) {
+export function Kraken({ look, state, quality, renderProp }: Props) {
   const root = useRef<THREE.Group>(null);
   const arms = useRef<THREE.Group>(null);
   const mood = useRef<Mood>({ ...MOODS.neutral });
-  const look = useRef<[number, number]>([0, 0]);
-  const skirt = useMemo(() => toonMaterial(COLORS.coral), []);
+  const gaze = useRef<[number, number]>([0, 0]);
+  const skirt = useMemo(() => lookMaterial(look, look.skin), [look]);
+  const skirtOutline = useMemo(() => new THREE.MeshBasicMaterial({ color: look.outline ?? '#000000', side: THREE.BackSide }), [look]);
+  const ow = look.outlineWidth * 1.4;
 
   useFrame(({ clock }, dt) => {
     // A throttled or background tab delivers a frame a second: snap instead of easing slowly.
     const snap = !quality.loop || dt > 0.25;
     const k = snap ? 1 : 1 - Math.exp(-dt * 6);
     mood.current = blendMood(mood.current, MOODS[state.mood], k);
-    look.current[0] += (state.look[0] - look.current[0]) * k;
-    look.current[1] += (state.look[1] - look.current[1]) * k;
+    gaze.current[0] += (state.look[0] - gaze.current[0]) * k;
+    gaze.current[1] += (state.look[1] - gaze.current[1]) * k;
     if (root.current) {
       // a slow bob, as if hanging in the water
       const bob = quality.loop ? Math.sin(clock.elapsedTime * 1.15) * 0.045 : 0;
@@ -43,14 +46,19 @@ export function Kraken({ state, quality, renderProp }: Props) {
 
   return (
     <group ref={root}>
-      <Body mood={mood} look={() => look.current} outline={quality.outline} animate={quality.loop} />
+      <Body look={look} mood={mood} gazeAt={() => gaze.current} outline={quality.outline} animate={quality.loop} />
       <group ref={arms}>
         {/* a soft skirt under the head hides where the arms begin */}
-        <mesh position={[0, -0.36, 0]} scale={[0.86, 0.3, 0.86]} material={skirt}>
+        <mesh position={[0, -0.36, 0]} scale={[0.86 * look.web, 0.3, 0.86 * look.web]} material={skirt}>
           <sphereGeometry args={[1, 32, 16]} />
         </mesh>
+        {quality.outline && look.outline && look.outlineWidth > 0 && (
+          <mesh position={[0, -0.36, 0]} scale={[0.86 * look.web + ow, 0.3 + ow, 0.86 * look.web + ow]} material={skirtOutline}>
+            <sphereGeometry args={[1, 32, 16]} />
+          </mesh>
+        )}
         {Array.from({ length: 8 }, (_, i) => (
-          <Arm key={i} index={i} state={state} quality={quality}>
+          <Arm key={i} index={i} look={look} state={state} quality={quality}>
             {renderProp?.(i)}
           </Arm>
         ))}

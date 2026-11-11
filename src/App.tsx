@@ -7,6 +7,7 @@ import { armIndexAt, armLocal } from './scroll/stages';
 import { useScrollProgress } from './scroll/useScrollProgress';
 import { useFlowProgress } from './scroll/useFlowProgress';
 import { detectDevice, qualityFor } from './kraken/quality';
+import { lookById } from './kraken/looks';
 import { Ascent } from './sections/Ascent';
 import { Creature, CreatureList } from './sections/Creature';
 import { Descent } from './sections/Descent';
@@ -29,6 +30,8 @@ export default function App() {
   const shift = useRef({ x: 0, t: 0 });
   const [device, setDevice] = useState(detectDevice);
   const quality = useMemo(() => qualityFor(device), [device]);
+  // ?look=mochi|dumbo|sticker|squid picks the kraken design
+  const look = useMemo(() => lookById(new URLSearchParams(location.search).get('look')), []);
   // Reduced motion or no 3D: an ordinary page, no pinning, no scrubbing.
   const flow = quality.mode === 'still' || quality.mode === 'none';
   useScrollProgress(root, !flow);
@@ -66,7 +69,7 @@ export default function App() {
       <WaterBack />
       {quality.mode !== 'none' && (
         <Suspense fallback={null}>
-          <Scene quality={quality} direct={direct} onLost={() => setDevice((d) => ({ ...d, webgl: false }))} />
+          <Scene quality={quality} look={look} direct={direct} onLost={() => setDevice((d) => ({ ...d, webgl: false }))} />
         </Suspense>
       )}
       <WaterFront />

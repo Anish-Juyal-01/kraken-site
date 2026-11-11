@@ -114,7 +114,7 @@ export function Creature() {
       {arm && (
         <div
           key={arm.id}
-          className={`card-in absolute inset-x-4 bottom-4 max-h-[56dvh] overflow-y-auto md:inset-x-auto md:bottom-auto md:top-1/2 md:max-h-[84dvh] md:w-[min(410px,32vw)] md:-translate-y-1/2 ${
+          className={`card-in absolute inset-x-4 bottom-4 max-h-[56dvh] overflow-y-auto md:inset-x-auto md:overflow-visible md:bottom-auto md:top-1/2 md:max-h-[84dvh] md:w-[min(410px,32vw)] md:-translate-y-1/2 ${
             right ? 'md:right-[8.5vw]' : 'md:left-[6vw]'
           }`}
         >

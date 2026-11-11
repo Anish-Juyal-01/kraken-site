@@ -20,7 +20,7 @@ export function armRadius(t: number): number {
   return 0.22 + (0.05 - 0.22) * Math.pow(x, 0.85);
 }
 
-export function armPoints(index: number, time: number, pose: ArmPose, lean: [number, number], segments: number): Vec3[] {
+export function armPoints(index: number, time: number, pose: ArmPose, lean: [number, number], segments: number, lengthScale = 1): Vec3[] {
   const reach = c01(pose.reach);
   const curl = c01(pose.curl);
   const lift = c01(pose.lift);
@@ -30,7 +30,7 @@ export function armPoints(index: number, time: number, pose: ArmPose, lean: [num
   const a = armAngle(index);
   const dx = Math.cos(a);
   const dz = Math.sin(a);
-  const length = 0.9 + 1.15 * reach;
+  const length = (0.9 + 1.15 * reach) * (Number.isFinite(lengthScale) && lengthScale > 0 ? lengthScale : 1);
   const ds = length / segments;
 
   let r = ARM_RING;
